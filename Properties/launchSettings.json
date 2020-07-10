@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "QBasket_demo": {
+      "commandName": "Project"
+    },
+    "Debug": {
+      "commandName": "Executable"
+    }
+  }
+}
