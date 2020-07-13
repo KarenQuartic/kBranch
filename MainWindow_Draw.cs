@@ -160,7 +160,10 @@ namespace QBasket_demo
 
             if (selectedLayers != null)
             {
+                // get the selected layers information
                 ResetWmtsInfo();
+
+                //Process each of the selected layers
                 if ((selectedLayers.Count > 0))
                 {
                     haveLayer = true;
@@ -208,6 +211,9 @@ namespace QBasket_demo
                         aoiWin.ImageryTitle.SelectedIndex = 0;
                         aoiWin.Top = mainWin.Top;
                         aoiWin.Left = mainWin.Left;
+
+                        // Get the list of layers to display then show
+                        aoiWin.getDisplayLayers();
                         if (aoiWin != null)
                         {
                             aoiWin.ShowDialog();

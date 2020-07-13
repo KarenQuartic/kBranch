@@ -22,7 +22,7 @@ namespace QBasket_demo
     /// <summary>
     /// Interaction logic for Window1.xaml
     /// </summary>
-    public partial class OutputFormatWindow : Window
+    public partial class DownloadWindow : Window
     {
         bool downloading = false;
         String downloadDir = String.Empty;
@@ -32,16 +32,16 @@ namespace QBasket_demo
         AGOL_User agolUser = new AGOL_User();
         //Task getPortal = agolUser.GetUserPortal();
 
-        public OutputFormatWindow()
+        public DownloadWindow()
         {
             InitializeComponent();
 
-            // Output the list of items selected w/checkboxes
+            // Init in UI items
             OutList.ItemsSource = mainWin.confirmItemsWin.confirmList;
             Out_NumItems.Text = mainWin.confirmItemsWin.NumItems.Text;
             Out_TotalSize.Text = mainWin.confirmItemsWin.TotalSize.Text;
 
-        }   // end OutputFormatWindow
+        }   // end DownloadWindow
 
 
         // Exit button callback
@@ -146,11 +146,9 @@ namespace QBasket_demo
                 mainWin.DownloadPanel.Visibility = Visibility.Visible;
                 downloading = true;
                 Hide();
-
             }
             else
             {
-
                 // Seting up the authorization
                 agolUser.OAuthPortal();
 
@@ -455,7 +453,7 @@ namespace QBasket_demo
             mainWin.aoiWin.Activate();
             mainWin.confirmItemsWin.Close();
         }   // end Worker_RunWorkerCompleted
-    } // end OutputFormatWindow class
+    } // end DownloadWindow class
 
 }   // end namespace
 

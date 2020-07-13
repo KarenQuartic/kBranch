@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Windows;
+using Esri.ArcGISRuntime.Mapping;
 using static QBasket_demo.MainWindow;
 
 
@@ -52,6 +53,7 @@ namespace QBasket_demo
 
             // Output the information for the item selected
             totalSize = 0;
+
             foreach (WMTS.DownloadLayerInfo info in mainWin.wmts.downloadInfo)
             {
                 str = info.title + "\n";
@@ -76,7 +78,10 @@ namespace QBasket_demo
             TotalSize.Text = str;
 
             // Output the list of items selected w/checkboxes
+            Debug.WriteLine("Download list count = " + mainWin.wmts.downloadInfo.Count);
+            Debug.WriteLine("Confirm list count = " + confirmList.Count);
             ConfirmList.ItemsSource = confirmList;
+
         }   // endConfirmItemsWin
 
 
@@ -140,12 +145,23 @@ namespace QBasket_demo
             if (num2Delete == confirmList.Count)
             {
                 confirmList.Clear();
+                mainWin.wmts.downloadInfo.Clear();
                 mainWin.aoiWin.CheckoutBtn.IsEnabled = false;
-                Hide();
+
+                // Update the Confirm UI displayed
+                ConfirmList.ItemsSource = null;
+                ConfirmList.ItemsSource = confirmList;
+                NumItems.Text = "0";
+                TotalSize.Text = "0";
+                if (mainWin.aoiWin.IsVisible == false)
+                    mainWin.aoiWin.ShowDialog();
+                mainWin.aoiWin.Activate();
+                Close();
             }
 
             // Remove the items selected for deletion
             else
+            {
                 for (int i = 0; i < confirmList.Count; i++)
                 {
                     if (confirmList[i].delete)
@@ -154,34 +170,18 @@ namespace QBasket_demo
                         mainWin.wmts.downloadInfo.RemoveAt(i);
                     }
                 }
-
-            // Update the Confirm list items displayed
-            ConfirmList.ItemsSource = null;
-            ConfirmList.ItemsSource = confirmList;
-
-            // If there are no items in the checkout list, close the window
-            // and go back to the AOI window
-            if (confirmList.Count < 1)
-            {
-                confirmList.Clear();
+            
+                // Update the Confirm list items displayed
                 ConfirmList.ItemsSource = null;
                 ConfirmList.ItemsSource = confirmList;
 
-                NumItems.Text = "0";
-                TotalSize.Text = "0";
-                //mainWin.Topmost = false;
-                if (mainWin.aoiWin.IsVisible == false)
-                    mainWin.aoiWin.ShowDialog();
-                mainWin.aoiWin.Activate();
-                Close();
+                // Update summary items
+                NumItems.Text = confirmList.Count.ToString();
+                double sum = 0;
+                foreach (WMTS.DownloadLayerInfo item in mainWin.wmts.downloadInfo)
+                    sum += item.nMBytes;
+                TotalSize.Text = sum.ToString("F4") + " MB";
             }
-
-            // Update summary items
-            NumItems.Text = confirmList.Count.ToString();
-            double sum = 0;
-            foreach (WMTS.DownloadLayerInfo item in mainWin.wmts.downloadInfo)
-                sum += item.nMBytes;
-            TotalSize.Text = sum.ToString("F4") + " MB";
         }   // end UpdateBtn_Click
 
 
@@ -193,12 +193,11 @@ namespace QBasket_demo
 
             // Process the confirmed layers
             // Show format dialog
-            OutputFormatWindow formatWin = new OutputFormatWindow();
-            formatWin.Top = mainWin.Top;
-            formatWin.Left = mainWin.Left;
-            formatWin.ShowDialog();
-            formatWin.Activate();
-            //  Close(); CONFIRM WIN
+            DownloadWindow downloadWin = new DownloadWindow();
+            downloadWin.Top = mainWin.Top;
+            downloadWin.Left = mainWin.Left;
+            downloadWin.ShowDialog();
+            downloadWin.Activate();
         }   // end Download_Click
 
 

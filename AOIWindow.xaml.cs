@@ -21,9 +21,16 @@ namespace QBasket_demo
     {
         public PanelVariables panelVars = new PanelVariables();
         public WmtsTileMatrixSet tileMatixSet;
+        public ArcGISMapImageLayer baseLayer;
+        public List<WmsLayer> displayLayers;
+
         public AOIWindow()
         {
             InitializeComponent();
+
+            // Initialize variables
+            displayLayers = new List<WmsLayer>();
+            baseLayer = mainWin.baseImageLayer;
 
         }   // end initialize
 
@@ -150,16 +157,42 @@ namespace QBasket_demo
             }
         }   // end RedrawAOI
 
+
+        // Reset operational layers to previous state
         private void ResetMapLayers()
         {
             WmsLayer showLayers = new WmsLayer(mainWin.selectedLayers);
 
             // Add the layer(s) to the map.
             mainWin.BasemapView.Map.OperationalLayers.Clear();
-            mainWin.BasemapView.Map.OperationalLayers.Add(mainWin.baseImageLayer);
+            mainWin.BasemapView.Map.OperationalLayers.Add(baseLayer);
             mainWin.BasemapView.Map.OperationalLayers.Add(showLayers);
         }
 
+
+        // Preload display layers
+        public void getDisplayLayers()
+        {
+            Debug.WriteLine("In get display layers");
+
+            if (displayLayers == null)
+                displayLayers = new List<WmsLayer>();
+            else
+                displayLayers.Clear();
+
+        // Create layers from selected layers
+            if (mainWin.selectedLayers != null)
+            {
+                for (int i = 0; i < mainWin.selectedLayers.Count; i++)
+                {
+                    List<WmsLayerInfo> layerList = new List<WmsLayerInfo>();
+                    layerList.Add(mainWin.selectedLayers[i]);
+                    WmsLayer showLayer = new WmsLayer(layerList);
+                    displayLayers.Add(showLayer);
+                }
+                Debug.WriteLine("Number of display layers = " + displayLayers.Count);
+            }           
+        }
 
         // Zoom Combo selection callback
         private void Zoom_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -235,12 +268,9 @@ namespace QBasket_demo
             {
                 // hold a reference to layer selected
                 // reset the selected layer displayed w/basemap
-                List<WmsLayerInfo> selectedLayer = new List<WmsLayerInfo>();
-                selectedLayer.Add(mainWin.selectedLayers[idx]);
-                WmsLayer showLayer = new WmsLayer(selectedLayer);
                 mainWin.BasemapView.Map.OperationalLayers.Clear();
                 mainWin.BasemapView.Map.OperationalLayers.Add(mainWin.baseImageLayer);
-                mainWin.BasemapView.Map.OperationalLayers.Add(showLayer);
+                mainWin.BasemapView.Map.OperationalLayers.Add(displayLayers[idx]);
 
                 // Reset Zoom levels for the new layer
                 mainWin.ResetZoomLevels(ImageryTitle.SelectedIndex, "Gilligan");

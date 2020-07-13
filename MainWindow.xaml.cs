@@ -69,7 +69,7 @@ namespace QBasket_demo
         public static MainWindow mainWin;
         public AOIWindow aoiWin;
         public ConfirmItemsWin confirmItemsWin;
-        public OutputFormatWindow outputFormatWin;
+        public DownloadWindow outputFormatWin;
 
         // Flags to simplify element state checking
         public bool haveSketch = false;
@@ -278,10 +278,6 @@ namespace QBasket_demo
 
             // Add the layer(s) to the map.
             BasemapView.Map.OperationalLayers.Add(showLayers);
-            
-            Debug.WriteLine(">>>  Number of layers in basemap = "
-                + BasemapView.Map.OperationalLayers.Count);
-
         }   // end UpdateViewModel
 
         private void QBasketWindow_Closing(object sender, CancelEventArgs e)
