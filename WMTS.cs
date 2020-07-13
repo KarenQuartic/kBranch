@@ -178,11 +178,9 @@ namespace QBasket_demo
             Uri wmtsServiceURI;
 
             // Create the WMTS Service Load data from the URI
-            Debug.WriteLine("Getting wmts capabilites " + uriStr);
             wmtsServiceURI = new Uri(uriStr);
 
             // Define an insatance of the service
-            Debug.WriteLine("Getting wmts service " + uriStr);
             wmtsService = new WmtsService(wmtsServiceURI);
 
             // If service can load, initialize the app
@@ -190,13 +188,11 @@ namespace QBasket_demo
             {
                 // Load the WMS Service.
                 await wmtsService.LoadAsync();
-                Debug.WriteLine("wmts service loaded ");
 
                 // Get the service info (metadata) from the service.
                 wmts.serviceInfo = wmtsService.ServiceInfo;
 
                 // Get the WMTS tile information
-                Debug.WriteLine("getting tile sets");
                 wmts.tileSets = new List<TileSetVariables>();
                 for (int i = 0; i < selectedLayers.Count; i++)
                 {
@@ -215,11 +211,9 @@ namespace QBasket_demo
 
                 // Obtain the read only list of WMTS layers info objects
                 // for selected layers
-                Debug.WriteLine("getting layer info");
                 wmts.selectedLayers = new List<WmtsLayerInfo>();
                 foreach (WmsLayerInfo wmsLayerInfo in selectedLayers)
                 {
-                    Debug.WriteLine("Adding " + wmsLayerInfo.Title);
                     str = wmsLayerInfo.Title;
                     foreach (WmtsLayerInfo wmtsLayerInfo in wmts.serviceInfo.LayerInfos)
                     {
@@ -305,7 +299,6 @@ namespace QBasket_demo
                 wmts.selectedLayers = new List<WmtsLayerInfo>();
                 foreach (WmsLayerInfo wmsLayerInfo in selectedLayers)
                 {
-                    Debug.WriteLine("Adding " + wmsLayerInfo.Title);
                     str = wmsLayerInfo.Title;
                     foreach (WmtsLayerInfo wmtsLayerInfo in wmts.serviceInfo.LayerInfos)
                     {
@@ -442,16 +435,10 @@ namespace QBasket_demo
             double latDiff = latMax - latMin;
             double lonDiff = lonMax - lonMin;
 
-            Debug.WriteLine("in GetZoomRange - flag " + flag);
-            Debug.WriteLine("in GetZoomRange - index " + idx);
-            Debug.WriteLine("number of tile sets - " + wmts.layerTileSets.Count);
-            Debug.WriteLine("resType.count = " + wmts.layerTileSets[idx].resTypes.Count);
-
             // Get the  max zoom level for this tile set
             int maxIdx = 0;
             for (i = 0; i < wmts.layerTileSets[idx].resTypes.Count; i++)
             {
-
                 res = wmts.layerTileSets[idx].resTypes[i].resolution;
                 pixLat = (int)(10.0 * (latDiff / res));
                 pixLon = (int)(10.0 * (lonDiff / res));

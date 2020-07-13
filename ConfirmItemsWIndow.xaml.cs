@@ -62,8 +62,10 @@ namespace QBasket_demo
                 str += "\nSize: " + info.pixelWidth.ToString() + " px x "
                                   + info.pixelHeight.ToString() + " px";
                 str += "  -  " + info.nMBytes.ToString("F4") + " MB";
-                str += "\nExtent: " + info.bbox[0].ToString("F4") + ", " + info.bbox[1].ToString("F4") + "   "
-                                    + info.bbox[2].ToString("F4") + ", " + info.bbox[3].ToString("F4");
+                str += "\nExtent: " + info.bbox[0].ToString("F4") + ", " 
+                                    + info.bbox[1].ToString("F4") + "   "
+                                    + info.bbox[2].ToString("F4") + ", " 
+                                    + info.bbox[3].ToString("F4");
 
                 confirmList.Add(new ConfirmItem()
                 {
@@ -78,8 +80,6 @@ namespace QBasket_demo
             TotalSize.Text = str;
 
             // Output the list of items selected w/checkboxes
-            Debug.WriteLine("Download list count = " + mainWin.wmts.downloadInfo.Count);
-            Debug.WriteLine("Confirm list count = " + confirmList.Count);
             ConfirmList.ItemsSource = confirmList;
 
         }   // endConfirmItemsWin
@@ -88,8 +88,6 @@ namespace QBasket_demo
         // Return button callback
         private void Return_Click(object sender, RoutedEventArgs e)
         {
-            Debug.WriteLine("Returning from confirmItems Window");
-
             // Hide confirm item window
             Hide();
 
@@ -97,8 +95,6 @@ namespace QBasket_demo
             // if ((mainWin.haveSketch) && (mainWin.haveLayer))
             if ((mainWin.haveSketch) && (mainWin.haveLayer))
             {
-                Debug.WriteLine("have sketch = " + mainWin.haveSketch.ToString());
-                Debug.WriteLine("have layer = " + mainWin.haveLayer.ToString());
                 mainWin.AOISelect.IsEnabled = true;
             }
 

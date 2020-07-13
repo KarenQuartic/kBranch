@@ -173,8 +173,6 @@ namespace QBasket_demo
         // Preload display layers
         public void getDisplayLayers()
         {
-            Debug.WriteLine("In get display layers");
-
             if (displayLayers == null)
                 displayLayers = new List<WmsLayer>();
             else
@@ -190,7 +188,6 @@ namespace QBasket_demo
                     WmsLayer showLayer = new WmsLayer(layerList);
                     displayLayers.Add(showLayer);
                 }
-                Debug.WriteLine("Number of display layers = " + displayLayers.Count);
             }           
         }
 
