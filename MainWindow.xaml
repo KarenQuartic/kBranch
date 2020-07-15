@@ -267,7 +267,8 @@
                                 </StackPanel>
                             </HierarchicalDataTemplate>
                         </TreeView.ItemTemplate>
-
+                        
+                        <!-- Set scrollbar properties -->
                         <TreeView.ItemContainerStyle>
                             <Style TargetType="{x:Type TreeViewItem}">
                                 <Setter Property="ScrollViewer.HorizontalScrollBarVisibility"

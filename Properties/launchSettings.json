@@ -1,10 +1,16 @@
 {
   "profiles": {
     "QBasket_demo": {
-      "commandName": "Project"
+      "commandName": "Project",
+      "logging": {
+        "moduleLoad": false
+      }
     },
     "Debug": {
-      "commandName": "Executable"
+      "commandName": "Executable",
+      "logging": {
+        "moduleLoad": false
+      }
     }
   }
 }

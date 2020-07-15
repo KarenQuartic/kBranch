@@ -47,7 +47,8 @@ namespace QBasket_demo
         // Hold a list of Layer view models
         private ObservableCollection<LayerInfoVM> _layerInfoOC =
             new ObservableCollection<LayerInfoVM>();
-
+        private ObservableCollection<LayerInfoVM> tempList =
+            new ObservableCollection<LayerInfoVM>();
         // WMS service
         private WmsService serviceWMS;
         private Uri serviceURI;
@@ -56,7 +57,6 @@ namespace QBasket_demo
 
 
         // Selected layer list
-        public List<WmsLayerInfo> sortedLayers;
         public List<WmsLayerInfo> selectedLayers;
         public ArcGISMapImageLayer baseImageLayer;
 
@@ -135,7 +135,6 @@ namespace QBasket_demo
         private async void InitializeWMSLayer_VM()
         {
             // Initialize the display with a basemap
-            // BasemapView is UI esri mapview name in XAML
             // Reset Map projection if applicable
             Map myMap = new Map(SpatialReference.Create(4326));
             baseImageLayer = new ArcGISMapImageLayer(new Uri(
@@ -164,25 +163,27 @@ namespace QBasket_demo
                 // Process info to get information for all the layers
                 // for the given serviceUri
                 // LayerInfos gets a list of sublayers for a given layer
-                foreach (var layerInfo in info.LayerInfos)
+                IList<LayerInfoVM> temp = new List<LayerInfoVM>();
+                foreach (WmsLayerInfo layerInfo in info.LayerInfos)
                     LayerInfoVM.BuildLayerInfoList(new LayerInfoVM(layerInfo, null, false), _layerInfoOC);
 
+                // NASA GIBS Specific
+                ProductLabel.Content = _layerInfoOC[0].Info.Title;
+                Sort_NASA_GIBS(_layerInfoOC, out temp);
+                _layerInfoOC.Clear();
 
-                // Sort Layers
-                // This sorts list but list does not get passed to Itemsource
-                /*
-                List<WmsLayerInfo> sortedWmsInfo = new List<WmsLayerInfo>();
-                ObservableCollection<LayerInfoVM> SortedList = new ObservableCollection<LayerInfoVM>( _layerInfoOC.OrderBy(o => o.Info.Title).ToList())
-                _layerInfoOC = new ObservableCollection<LayerInfoVM>(SortedList);
-                */
+                foreach (LayerInfoVM layerInfo in temp)
+                    _layerInfoOC.Add(layerInfo);
 
                 // Update the map display based on the viewModel.
                 UpdateViewModel(_layerInfoOC);
 
                 // Update UI element
+                /*
                 ProductLabel.Content = "NASA GIBS - " + wmsUriStartup.EPSG + " - "
                                                       + wmsUriStartup.latency;
-                ProductTreeView.ItemsSource = _layerInfoOC.Take(1);
+                */
+                ProductTreeView.ItemsSource = _layerInfoOC;
             }   // end try
             catch (Exception e)
             {
@@ -263,7 +264,7 @@ namespace QBasket_demo
 
             // Get a list of selected LayerInfos.
             selectedLayers =
-                new List<WmsLayerInfo>(displayList.Where(vm => vm.IsEnabled).Select(vm => vm.Info).ToList());
+                new List<WmsLayerInfo>(displayList.Where(checkBox => checkBox.IsEnabled).Select(checkBox => checkBox.Info).ToList());
 
             // Return if no layers are selected.
             if (!selectedLayers.Any())
@@ -278,12 +279,36 @@ namespace QBasket_demo
 
             // Add the layer(s) to the map.
             BasemapView.Map.OperationalLayers.Add(showLayers);
+
+            foreach (LayerInfoVM layerInfo in _layerInfoOC)
+            {
+                Debug.WriteLine(" Title: " + layerInfo.Title);
+                Debug.WriteLine(" # of children : " + layerInfo.Children.Count);
+            }
         }   // end UpdateViewModel
 
+
+        // Window shutdown routine - set in Xaml file
         private void QBasketWindow_Closing(object sender, CancelEventArgs e)
         {
             Application.Current.Shutdown();
         }
+
+        /// Sort the layer OC 
+        /// SPecific to NASA GIBS:
+        /// Orbit tracks not included
+        /// Want a list of items with no children
+        public static void Sort_NASA_GIBS(IList<LayerInfoVM> unsorted, out IList<LayerInfoVM> sorted)
+        {
+            LayerInfoVM firstLayer;
+            IList<LayerInfoVM> temp = new List<LayerInfoVM>();
+
+            firstLayer = unsorted[0];
+            for (int i = 1; i < unsorted.Count; i++)
+                temp.Add(unsorted[i]);
+            sorted = temp.OrderBy(o => o.Info.Title).ToList();
+
+        }   // end Sort_NASA_GIBS
     }   // end MainWindow partial class
 
 
@@ -318,11 +343,11 @@ namespace QBasket_demo
         public string nearestValue = "1";
 
         // Set in Start up window
-        public string startDate = "2013-05-29";
-        public string endDate = "2013-12-21";
+        public string startDate = String.Empty;
+        public string endDate = String.Empty;
 
         // Defined in GetWmsUri
-        public string value = "2012-05-08/2013-05-29/P1D";
+        public string value = String.Empty;
     }   // end timeClass
 
 
@@ -373,6 +398,7 @@ namespace QBasket_demo
             set { Select(value); }
         }   // end IsEnabled
 
+
         // Select this layer and all child layers.
         private void Select(bool isSelected = true)
         {
@@ -419,9 +445,10 @@ namespace QBasket_demo
             // Recursively add sublayers.
             foreach (WmsLayerInfo layer in root.Info.LayerInfos)
             {
-                if ((layer.Title.Contains("Land Surface Reflectance")) ||
-                     (layer.Title.Contains("Digital")))
+
+                if (!layer.Title.Contains("OrbitTracks"))
                 {
+                
                     // Create the view model for the sublayer.
                     LayerInfoVM layerVM = new LayerInfoVM(layer, root, false);
 
@@ -430,9 +457,14 @@ namespace QBasket_demo
 
                     // Recursively add children.
                     BuildLayerInfoList(layerVM, result);
+                
                 }
             }   // end foreach
         }   // end BuildLayerInfoList
+
+
+
+
 
 
         // Standard event parser -
