@@ -68,9 +68,9 @@
             <Setter Property="BorderThickness"
                     Value="1" />
             <Setter Property="Height"
-                    Value="15" />
+                    Value="16" />
             <Setter Property="Width"
-                    Value="15" />
+                    Value="16" />
         </Style>
         <Style x:Key="BlueBorder"
                TargetType="Border">
@@ -207,10 +207,12 @@
                 MinHeight="290"
                 MaxWidth="300"
                 MaxHeight="300"
-                VerticalAlignment="Top"
+                VerticalAlignment="Center"
                 HorizontalAlignment="Stretch">
 
             <StackPanel x:Name="ProductPanel"
+                        CanVerticallyScroll="True"
+                        CanHorizontallyScroll="True"
                         Grid.Row="0"
                         Grid.Column="0"
                         Width="Auto"
@@ -222,16 +224,18 @@
                        Style="{StaticResource TitleLabel}"
                        FontSize="11"
                        Width="Auto"
-                       Height="25"
+                       Height="Auto"
                        MaxWidth="300"
+                       MinHeight="25"
                        VerticalAlignment="Center"
                        HorizontalAlignment="Stretch" />
 
-                <Grid x:Name="TreeviewGrid"
+                <!--
+                <Grid x:Name="ProductGrid"
                       Width="Auto"
-                      Height="275"
+                      Height="Auto"
                       MaxWidth="300"
-                      MinHeight="275"
+                      MinHeight="200"
                       HorizontalAlignment="Stretch">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="300"
@@ -239,10 +243,48 @@
                     </Grid.ColumnDefinitions>
 
                     <Grid.RowDefinitions>
-                        <RowDefinition Height="275"
+                        <RowDefinition Height="Auto"
                                        MaxHeight="275" />
                     </Grid.RowDefinitions>
+                -->
+                <StackPanel Orientation="Vertical"
+                            CanHorizontallyScroll="True"
+                            CanVerticallyScroll="True">
+                    <ListBox  x:Name="ProductList" 
+                          Width="Auto"
+                          Height="275"
+                          MaxWidth="300"
+                          MinHeight="200"
+                          Grid.Row="0"
+                          Grid.Column="0"
+                          HorizontalAlignment="Stretch">
+                        <!--
+                    Grid.Column="0"
+                              Grid.Row="1"                        
+                              Grid.ColumnSpan="2">
+                    -->
+                        <ListBox.ItemContainerStyle>
+                            <Style TargetType="{x:Type ListBoxItem}">
+                                <Setter Property="IsSelected" 
+                                        Value="{Binding IsEnabled, Mode=OneWay}"/>
+                                <Setter Property="VerticalContentAlignment"
+                                        Value="Center"/>
+                            </Style>
+                        </ListBox.ItemContainerStyle>
+                        <ListBox.ItemTemplate>
 
+                            <DataTemplate>
+                                <CheckBox Content="{Binding Title}" 
+                                          IsChecked="{Binding Selected}"
+                                          VerticalContentAlignment="Center"
+                                          Margin="2"
+                                          Checked="ToggleButton_OnChecked"
+                                          Unchecked="ToggleButton_OnChecked" />
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                </StackPanel>
+                <!--
                     <TreeView Name="ProductTreeView"
                               Grid.Column="0"
                               Grid.Row="0">
@@ -268,7 +310,6 @@
                             </HierarchicalDataTemplate>
                         </TreeView.ItemTemplate>
                         
-                        <!-- Set scrollbar properties -->
                         <TreeView.ItemContainerStyle>
                             <Style TargetType="{x:Type TreeViewItem}">
                                 <Setter Property="ScrollViewer.HorizontalScrollBarVisibility"
@@ -278,7 +319,9 @@
                             </Style>
                         </TreeView.ItemContainerStyle>
                     </TreeView>
-                </Grid>
+            </Grid>
+                -->
+
             </StackPanel>
         </Border>
 
@@ -301,7 +344,8 @@
                 <!-- AOI Draw/Select Buttons -->
                 <Grid>
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="178.167" />
+                        <ColumnDefinition Width="99.833"/>
                     </Grid.ColumnDefinitions>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="*" />
@@ -310,14 +354,14 @@
                     </Grid.RowDefinitions>
                     <Label Style="{StaticResource PanelLabel}"
                            Grid.Column="0"
-                           Grid.Row="0">
+                           Grid.Row="0" Grid.ColumnSpan="2">
                         AREA OF INTEREST
                     </Label>
                     <StackPanel Orientation="Horizontal"
-                                HorizontalAlignment="Center"
+                                HorizontalAlignment="Left"
                                 Grid.Row="1"
                                 Grid.Column="0"
-                                Margin="0,5,0,0">
+                                Margin="0,5,0,0" Grid.ColumnSpan="2">
 
                         <Button x:Name="AOIDraw"
                                 Content="Draw"
@@ -367,7 +411,7 @@
                                 ToolTipService.Placement="Left"
                                 ToolTipService.HasDropShadow="True"
                                 ToolTipService.ToolTip="Erase current drawing and return control to map"
-                                Click="CancelButtonClick"/>
+                                Click="Back2MapButtonClick"/>
                         <!--  Command="{Binding CancelCommand}" /> -->
                     </StackPanel>
                 </Grid>

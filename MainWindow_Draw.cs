@@ -248,6 +248,80 @@ namespace QBasket_demo
         }   // end SelectButtonClick
 
 
+        private void ClearButtonClick(object sender, RoutedEventArgs e)
+        {
+            // Remove all graphics from the graphics overlay
+            BasemapView.SketchEditor.ClearGeometry();
+            sketchOverlay.Graphics.Clear();
+            haveSketch = false;
+
+            // Set buttons and popups
+            AOIDraw.IsEnabled = true;
+            AOISelect.IsEnabled = false;
+            AOIClear.IsEnabled = false;
+            AOICancel.IsEnabled = true;
+
+        }   // end ClearButtonClick
+
+
+        // same as Back to map
+        private void Back2MapButtonClick(object sender, RoutedEventArgs e)
+        {
+            if (BasemapView.SketchEditor.CancelCommand.CanExecute(null))
+            {
+                BasemapView.SketchEditor.ClearGeometry();
+                sketchOverlay.Graphics.Clear();
+                haveSketch = false;
+                BasemapView.SketchEditor.Stop();
+            }
+
+            // Set buttons and popups
+            AOIDraw.IsEnabled = true;
+            AOISelect.IsEnabled = false;
+            AOIClear.IsEnabled = false;
+            AOICancel.IsEnabled = true;
+        }   // end CancelButtonClick
+
+
+        private void UpdateDatesBtn_Click(object sender, RoutedEventArgs e)
+        {
+            String str;
+            DateTime start = startDate_DP.DisplayDate;
+            // DateTime end = endDate_DP.DisplayDate;   // add back in when animation is considered
+            // str = "Start Date:" + start.Date + "\n" +
+            //       "End Date: " + end.Date;
+            str = "Date is now\n" + start.Date;
+            MessageBox.Show(str, "NEW DATE");
+            UpdateDatesBtn.IsEnabled = false;
+        }   // end ReloadLayerBtn_Click
+
+
+        private void CheckoutBtn_Click(object sender, RoutedEventArgs e)
+        {
+            // Set up windows
+            mainWin.aoiWin.Hide();
+
+            // Create a new Confirm window
+            mainWin.confirmItemsWin = new ConfirmItemsWin();
+            mainWin.confirmItemsWin.ShowDialog();
+            mainWin.confirmItemsWin.Activate();
+        }   // end CheckoutBtn_Click
+
+        private void QuitBtn_Click(object sender, RoutedEventArgs e)
+        {
+            Application.Current.Shutdown();
+        }   // end QuitBtn_Click
+
+
+        private void SelectedDateChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (UpdateDatesBtn != null)
+            {
+                UpdateDatesBtn.IsEnabled = true;
+            }
+        }   // end SelectedDateChanged
+
+
         // Intialize WMTS data
         private async void InitializeWMTS()
         {
@@ -458,7 +532,8 @@ namespace QBasket_demo
         public void ResetZoomLevels(int idx, string flag)
         {
             int i;
-            flag = "Select Zoom Level";
+            //flag = "Select Zoom Level";
+            Debug.WriteLine("index = " + idx);
 
             // Calculate range
             double latDiff = Math.Abs(Convert.ToDouble(aoiWin.MaxLat.Text) -
@@ -475,6 +550,7 @@ namespace QBasket_demo
                 aoiWin.panelVars.resolutionList = new List<string>();
 
                 // Set zoom level list for given index
+              
                 for (i = 0; i < wmts.layerTileSets[idx].resTypes.Count; i++)
                     aoiWin.panelVars.resolutionList.Add(wmts.layerTileSets[idx].resTypes[i].id);
 
@@ -612,76 +688,6 @@ namespace QBasket_demo
 
         } // end AddDownloadItem
 
-        private void ClearButtonClick(object sender, RoutedEventArgs e)
-        {
-            // Remove all graphics from the graphics overlay
-            BasemapView.SketchEditor.ClearGeometry();
-            sketchOverlay.Graphics.Clear();
-            haveSketch = false;
 
-            // Set buttons and popups
-            AOIDraw.IsEnabled = true;
-            AOISelect.IsEnabled = false;
-            AOIClear.IsEnabled = false;
-            AOICancel.IsEnabled = true;
-
-        }   // end ClearButtonClick
-
-        // same as Back to map
-        private void CancelButtonClick(object sender, RoutedEventArgs e)
-        {
-            sketchOverlay.Graphics.Clear();
-            if (BasemapView.SketchEditor.CancelCommand.CanExecute(null))
-                BasemapView.SketchEditor.CancelCommand.CanExecute(null);
-            haveSketch = false;
-
-            // Set buttons and popups
-            AOIDraw.IsEnabled = true;
-            AOISelect.IsEnabled = false;
-            AOIClear.IsEnabled = false;
-            AOICancel.IsEnabled = true;
-        }   // end CancelButtonClick
-
-
-        private void UpdateDatesBtn_Click(object sender, RoutedEventArgs e)
-        {
-            String str;
-            DateTime start = startDate_DP.DisplayDate;
-            // DateTime end = endDate_DP.DisplayDate;   // add back in when animation is considered
-            // str = "Start Date:" + start.Date + "\n" +
-            //       "End Date: " + end.Date;
-            str = "Date is now\n" + start.Date;
-            MessageBox.Show(str, "NEW DATE");
-            UpdateDatesBtn.IsEnabled = false;
-        }   // end ReloadLayerBtn_Click
-
-
-        private void CheckoutBtn_Click(object sender, RoutedEventArgs e)
-        {
-            // Set up windows
-            //mainWin.Topmost = false;
-            //mainWin.aoiWin.Topmost = false;
-            mainWin.aoiWin.Hide();
-
-            // Create a new Confirm window
-            mainWin.confirmItemsWin = new ConfirmItemsWin();
-            mainWin.confirmItemsWin.ShowDialog();
-            mainWin.confirmItemsWin.Activate();
-            //mainWin.confirmItemsWin.Topmost = true;
-        }   // end CheckoutBtn_Click
-
-        private void QuitBtn_Click(object sender, RoutedEventArgs e)
-        {
-            Application.Current.Shutdown();
-        }   // end QuitBtn_Click
-
-
-        private void SelectedDateChanged(object sender, SelectionChangedEventArgs e)
-        {
-            if (UpdateDatesBtn != null)
-            {
-                UpdateDatesBtn.IsEnabled = true;
-            }
-        }   // end SelectedDateChanged
     }   // end  partial class MainWindow
 }   // end namespace QBasket_demo

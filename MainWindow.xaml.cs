@@ -90,7 +90,6 @@ namespace QBasket_demo
             // Create and show start up dialog
             winStartUp = new StartUpWindow();
             winStartUp.ShowDialog();
-            // winStartUp.Topmost = true;
             winStartUp.Activate();
 
             // Exit application if the user exited the startup window
@@ -168,22 +167,25 @@ namespace QBasket_demo
                     LayerInfoVM.BuildLayerInfoList(new LayerInfoVM(layerInfo, null, false), _layerInfoOC);
 
                 // NASA GIBS Specific
-                ProductLabel.Content = _layerInfoOC[0].Info.Title;
+                #region NASA
+                string epsg = wmsUriStartup.EPSG.Substring(0, 4) + "-"
+                              + wmsUriStartup.EPSG.Substring(4, 4);
+                ProductLabel.Content = "NASA GIBS for EODIS: " 
+                                       + wmsUriStartup.latency.ToUpper() + " - "
+                                       + epsg.ToUpper();
                 Sort_NASA_GIBS(_layerInfoOC, out temp);
                 _layerInfoOC.Clear();
 
                 foreach (LayerInfoVM layerInfo in temp)
                     _layerInfoOC.Add(layerInfo);
+                #endregion NASA
 
                 // Update the map display based on the viewModel.
                 UpdateViewModel(_layerInfoOC);
 
-                // Update UI element
-                /*
-                ProductLabel.Content = "NASA GIBS - " + wmsUriStartup.EPSG + " - "
-                                                      + wmsUriStartup.latency;
-                */
-                ProductTreeView.ItemsSource = _layerInfoOC;
+                // Update Product List
+                //ProductTreeView.ItemsSource = _layerInfoOC;
+                ProductList.ItemsSource = _layerInfoOC;
             }   // end try
             catch (Exception e)
             {
@@ -194,6 +196,7 @@ namespace QBasket_demo
 
         ///
         /// Use start up variables to define wms Uris
+        #region NASA
         public void GetWmsUri()
         {
             // Retrieve URL components from the start up window
@@ -231,6 +234,7 @@ namespace QBasket_demo
                 wmsUriStartup.service + ".cgi?SERVICE=WMS&REQUEST=GetCapabilities&VERSION=1.3.0";
 
         }   // end GetWmsUri
+        #endregion NASA
 
 
         /// <summary>
@@ -243,17 +247,27 @@ namespace QBasket_demo
             // Update the map. 
             // Note: updating selection is handled by the IsEnabled property
             UpdateViewModel(_layerInfoOC);
-            if (haveSketch && haveLayer)
-                AOISelect.IsEnabled = true;
-            else
+
+            // If no layer is selected, turn off select button
+            if (haveLayer == false)
                 AOISelect.IsEnabled = false;
+
+            // Have a layer
+            else 
+            {
+                // if there is a sketch, turn on select button
+                if (haveSketch)
+                    AOISelect.IsEnabled = true;
+                else
+                    AOISelect.IsEnabled = false;
+            }
         }   // end ToggleButton_OnChecked
 
 
         /// <summary>
         /// Updates the map view model
         /// </summary>
-        private void UpdateViewModel(ObservableCollection<LayerInfoVM> displayList)
+        private void UpdateViewModel(ObservableCollection<LayerInfoVM> productList)
         {
             // Remove all existing layers and redraw map
             if (BasemapView.Map.OperationalLayers.Count > 1)
@@ -262,10 +276,19 @@ namespace QBasket_demo
                 BasemapView.Map.OperationalLayers.Add(baseImageLayer);
             }
 
-            // Get a list of selected LayerInfos.
-            selectedLayers =
-                new List<WmsLayerInfo>(displayList.Where(checkBox => checkBox.IsEnabled).Select(checkBox => checkBox.Info).ToList());
+            // Get a list of selected LayerInfos
+            /*
+           selectedLayers = new List<WmsLayerInfo>();
+           foreach (LayerInfoVM layer in productList)
+           {
+               if (layer.Selected == true)
+                   selectedLayers.Add(layer.Info);
+           }
+               */
 
+            selectedLayers =
+               new List<WmsLayerInfo>(productList.Where(checkBox => checkBox.Selected).Select(checkBox => checkBox.Info).ToList());
+        
             // Return if no layers are selected.
             if (!selectedLayers.Any())
             {
@@ -274,17 +297,13 @@ namespace QBasket_demo
             }
             else
                 haveLayer = true;
+            Debug.WriteLine("Number of layers selected = " + selectedLayers.Count);
 
             WmsLayer showLayers = new WmsLayer(selectedLayers);
 
             // Add the layer(s) to the map.
             BasemapView.Map.OperationalLayers.Add(showLayers);
 
-            foreach (LayerInfoVM layerInfo in _layerInfoOC)
-            {
-                Debug.WriteLine(" Title: " + layerInfo.Title);
-                Debug.WriteLine(" # of children : " + layerInfo.Children.Count);
-            }
         }   // end UpdateViewModel
 
 
@@ -295,9 +314,10 @@ namespace QBasket_demo
         }
 
         /// Sort the layer OC 
-        /// SPecific to NASA GIBS:
+        /// Specific to NASA GIBS:
         /// Orbit tracks not included
         /// Want a list of items with no children
+        #region NASA
         public static void Sort_NASA_GIBS(IList<LayerInfoVM> unsorted, out IList<LayerInfoVM> sorted)
         {
             LayerInfoVM firstLayer;
@@ -309,6 +329,7 @@ namespace QBasket_demo
             sorted = temp.OrderBy(o => o.Info.Title).ToList();
 
         }   // end Sort_NASA_GIBS
+        #endregion 
     }   // end MainWindow partial class
 
 

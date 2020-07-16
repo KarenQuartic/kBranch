@@ -231,7 +231,7 @@
                        Content="Check item(s) then Delete to update"/>
 
                 <ListBox  x:Name="ConfirmList" 
-                          Height="350"
+                          Height="300"
                            Grid.Column="0"
                            Grid.Row="1"                        
                            Grid.ColumnSpan="2">
@@ -288,7 +288,7 @@
                    Margin="0,5,5,5"
                    Visibility="Collapsed"
                    Height="24"
-                   Grid.Row="4"
+                   Grid.Row="5"
                    Grid.Column="0"
                    HorizontalAlignment="Right"
                    VerticalAlignment="Bottom"/>
