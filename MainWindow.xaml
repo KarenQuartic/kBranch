@@ -12,11 +12,11 @@
         Title="Q Basket"
         DataContext="MainWindow"
         Closing="QBasketWindow_Closing"
-       
+
         Background="#DFEBF4"
         FontFamily="Montserrat"
         FontSize="10"
-        
+
         WindowStyle="SingleBorderWindow"
         WindowStartupLocation="CenterScreen"
         ResizeMode="NoResize"
@@ -199,7 +199,7 @@
                                     Source={StaticResource MapViewModel}}" />
 
         <!-- Product Panel -->
-        <Border Style="{StaticResource BlueBorder}" 
+        <Border Style="{StaticResource BlueBorder}"
                 Grid.Row="0"
                 Grid.Column="0"
                 Width="Auto"
@@ -250,7 +250,7 @@
                 <StackPanel Orientation="Vertical"
                             CanHorizontallyScroll="True"
                             CanVerticallyScroll="True">
-                    <ListBox  x:Name="ProductList" 
+                    <ListBox  x:Name="ProductList"
                           Width="Auto"
                           Height="275"
                           MaxWidth="300"
@@ -260,12 +260,12 @@
                           HorizontalAlignment="Stretch">
                         <!--
                     Grid.Column="0"
-                              Grid.Row="1"                        
+                              Grid.Row="1"
                               Grid.ColumnSpan="2">
                     -->
                         <ListBox.ItemContainerStyle>
                             <Style TargetType="{x:Type ListBoxItem}">
-                                <Setter Property="IsSelected" 
+                                <Setter Property="IsSelected"
                                         Value="{Binding IsEnabled, Mode=OneWay}"/>
                                 <Setter Property="VerticalContentAlignment"
                                         Value="Center"/>
@@ -274,7 +274,7 @@
                         <ListBox.ItemTemplate>
 
                             <DataTemplate>
-                                <CheckBox Content="{Binding Title}" 
+                                <CheckBox Content="{Binding Title}"
                                           IsChecked="{Binding Selected}"
                                           VerticalContentAlignment="Center"
                                           Margin="2"
@@ -309,7 +309,7 @@
                                 </StackPanel>
                             </HierarchicalDataTemplate>
                         </TreeView.ItemTemplate>
-                        
+
                         <TreeView.ItemContainerStyle>
                             <Style TargetType="{x:Type TreeViewItem}">
                                 <Setter Property="ScrollViewer.HorizontalScrollBarVisibility"
@@ -431,13 +431,13 @@
                         <RowDefinition Height="Auto" />
                     </Grid.RowDefinitions>
 
-                    <Label Style="{StaticResource ElementLabel}" 
+                    <Label Style="{StaticResource ElementLabel}"
                            Grid.Row="0"
                            Grid.Column="0"
                            Margin="25,0,0,0"
                            VerticalAlignment="Center"
                            HorizontalContentAlignment="Right">
-                        mm/dd/yyy
+                        mm/dd/yyyy
                     </Label>
                     <DatePicker x:Name="startDate_DP"
                                 Grid.Row="0"
@@ -449,14 +449,14 @@
                     </DatePicker>
 
                     <Button x:Name="UpdateDatesBtn"
-                            Content="Update Dates" 
+                            Content="Update Dates"
                             ToolTipService.PlacementRectangle="10,10,50,50"
                             ToolTipService.Placement="Left"
                             ToolTipService.HasDropShadow="True"
                             ToolTipService.ToolTip="Reload the layers with new date range"
                             Margin="10,0"
-                            Width =" 70" 
-                            Height ="20" 
+                            Width =" 70"
+                            Height ="20"
                             Grid.Column="2"
                             Grid.Row="0"
                             Grid.RowSpan="2"
@@ -473,17 +473,17 @@
                     </DatePicker>
 
 
-                    <!-- option to reload loayers with new dates -->
+                    <!-- option to reload layers with new dates -->
                 </Grid>
 
                 <StackPanel Orientation="Horizontal"
                             Grid.Column="0"
-                            Grid.Row="2" 
+                            Grid.Row="2"
                             HorizontalAlignment="Center">
                     <Button x:Name="MainCheckoutBtn"
-                            Content="Checkout" 
+                            Content="Checkout"
                             Margin="10,0"
-                            Width =" 70" 
+                            Width =" 70"
                             Height ="20"
                             IsEnabled="False"
                             ToolTipService.PlacementRectangle="10,10,50,50"
@@ -530,7 +530,7 @@
                    Visibility="Visible"
                    Grid.Row="0"
                    Grid.Column="0"
-                   Height="24"                  
+                   Height="24"
                    HorizontalAlignment="Right"
                    VerticalAlignment="Bottom" />
 
@@ -580,7 +580,7 @@
                                  VerticalAlignment="Top"
                                  HorizontalAlignment="Left"
                                  Width="649"
-                                 Height="20" 
+                                 Height="20"
                                  Margin="241,17,0,0" Grid.ColumnSpan="2"/>
                     </Grid>
 

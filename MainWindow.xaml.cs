@@ -1,15 +1,15 @@
 ﻿
 // TODO List
-//Bugs - 
+//Bugs -
 // AOIwin -> Draw -> Select - errors on select null list
 // Error after Besty - happens when no layers are selected after initial set up
-// WHen the imagery title list is null - xaml throws a binding error becuase it cannot find 
+// WHen the imagery title list is null - xaml throws a binding error because it cannot find
 //      its respective image title list - > never let list get null!
 //-----------------------------------------
 // Is the adopted wms vm the best - can the vm be reimplemented using a
 //  similar approach to the confirmItems Panel Checkbox list?
 //
-// Sort imagery list - list is sorted but lose something 
+// Sort imagery list - list is sorted but lose something
 // above may help
 // change date on aoiwin to date selection - not text
 // need to do to make sure date is always in correct format
@@ -17,7 +17,7 @@
 // Responsive ui - ongoing updates
 // Add date range option
 // add wmts output
-//      
+// 
 
 using Esri.ArcGISRuntime.Geometry;
 using Esri.ArcGISRuntime.Mapping;
@@ -35,7 +35,7 @@ using System.Windows;
 namespace QBasket_demo
 {
     /// Namespace Classes
-    /// 
+    ///
     /// <summary>
     /// Logic for MainWindow.xaml
     /// </summary>
@@ -168,9 +168,9 @@ namespace QBasket_demo
 
                 // NASA GIBS Specific
                 #region NASA
-                string epsg = wmsUriStartup.EPSG.Substring(0, 4) + "-"
+                string epsg = wmsUriStartup.EPSG.Substring(0, 4) + ":"
                               + wmsUriStartup.EPSG.Substring(4, 4);
-                ProductLabel.Content = "NASA GIBS for EODIS: " 
+                ProductLabel.Content = "NASA GIBS for EODIS: "
                                        + wmsUriStartup.latency.ToUpper() + " - "
                                        + epsg.ToUpper();
                 Sort_NASA_GIBS(_layerInfoOC, out temp);
@@ -244,7 +244,7 @@ namespace QBasket_demo
         /// <param name="e"></param>
         private void ToggleButton_OnChecked(object sender, RoutedEventArgs e)
         {
-            // Update the map. 
+            // Update the map.
             // Note: updating selection is handled by the IsEnabled property
             UpdateViewModel(_layerInfoOC);
 
@@ -253,7 +253,7 @@ namespace QBasket_demo
                 AOISelect.IsEnabled = false;
 
             // Have a layer
-            else 
+            else
             {
                 // if there is a sketch, turn on select button
                 if (haveSketch)
@@ -288,7 +288,7 @@ namespace QBasket_demo
 
             selectedLayers =
                new List<WmsLayerInfo>(productList.Where(checkBox => checkBox.Selected).Select(checkBox => checkBox.Info).ToList());
-        
+
             // Return if no layers are selected.
             if (!selectedLayers.Any())
             {
@@ -297,7 +297,6 @@ namespace QBasket_demo
             }
             else
                 haveLayer = true;
-            Debug.WriteLine("Number of layers selected = " + selectedLayers.Count);
 
             WmsLayer showLayers = new WmsLayer(selectedLayers);
 
@@ -313,7 +312,7 @@ namespace QBasket_demo
             Application.Current.Shutdown();
         }
 
-        /// Sort the layer OC 
+        /// Sort the layer list
         /// Specific to NASA GIBS:
         /// Orbit tracks not included
         /// Want a list of items with no children
@@ -375,7 +374,7 @@ namespace QBasket_demo
     /// --------------------------------------------------
     /// Code Below taken from Runtime WMS Service Catalog
     /// --------------------------------------------------
-    /// This is a ViewModel class for maintaining the 
+    /// This is a ViewModel class for maintaining the
     /// state of a layer selection.
     /// LayerInfo has two public elements:
     ///     Info: WmsLayerInfo type
@@ -469,7 +468,7 @@ namespace QBasket_demo
 
                 if (!layer.Title.Contains("OrbitTracks"))
                 {
-                
+
                     // Create the view model for the sublayer.
                     LayerInfoVM layerVM = new LayerInfoVM(layer, root, false);
 
@@ -478,7 +477,7 @@ namespace QBasket_demo
 
                     // Recursively add children.
                     BuildLayerInfoList(layerVM, result);
-                
+
                 }
             }   // end foreach
         }   // end BuildLayerInfoList

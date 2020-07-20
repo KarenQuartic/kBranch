@@ -36,7 +36,7 @@ namespace QBasket_demo
         {
             InitializeComponent();
 
-            // Init in UI items
+            // Initialize  in UI items
             OutList.ItemsSource = mainWin.confirmItemsWin.confirmList;
             Out_NumItems.Text = mainWin.confirmItemsWin.NumItems.Text;
             Out_TotalSize.Text = mainWin.confirmItemsWin.TotalSize.Text;
@@ -79,7 +79,7 @@ namespace QBasket_demo
         }   // endCancelBtn_Click
 
 
-        // Default window closing for F4 and titlebar closing
+        // Default window closing for F4 and title bar closing
         private void QBasketFormatWin_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
             bool carryOn = false;
@@ -97,7 +97,7 @@ namespace QBasket_demo
         }   // end QBasketFormatWin_Closing
 
 
-        // Download warning 
+        // Download warning
         private bool showWarning()
         {
             // Configure the message box to be displayed
@@ -133,23 +133,18 @@ namespace QBasket_demo
             // If a local download - get download directory
             if (imageFileRB.IsChecked == true)
             {
-                if (imageFileRB.IsChecked == true)
-                    dialog.Description = "Select download directory";
-                else
-                    dialog.Description = "Select temporary download directory";
+                dialog.Description = "Select download directory";
                 dialog.UseDescriptionForTitle = true;
                 result = dialog.ShowDialog();
                 if (result.ToString() == "OK")
                     downloadDir = dialog.SelectedPath;
-
-                // show progress bar adn hide dowload window
-                mainWin.DownloadPanel.Visibility = Visibility.Visible;
-                downloading = true;
-                Hide();
+                else if (result.ToString() == "Cancel")
+                    return;
             }
+            // otherwise get AGOL authorization
             else
             {
-                // Seting up the authorization
+                // Setting up the authorization
                 agolUser.OAuthPortal();
 
                 // Get user credentials
@@ -159,7 +154,7 @@ namespace QBasket_demo
                     GenerateTokenOptions = new GenerateTokenOptions
                     { TokenAuthenticationType = TokenAuthenticationType.OAuthImplicit },
 
-                    // Indicate the url (portal) to authenticate with (ArcGIS Online)
+                    // Set the url (portal) to authenticate with (ArcGIS Online)
                     ServiceUri = new Uri(agolUser.serviceUrl)
                 };
 
@@ -171,21 +166,21 @@ namespace QBasket_demo
 
                     // Call GetCredentialAsync on the AuthenticationManager to invoke the challenge handler
                     await thisAM.GetCredentialAsync(loginInfo, false);
+
+                    // Create the portal
+                    // Get the ArcGIS Online portal (will use credential from login above)
+                    agolUser.portal = await ArcGISPortal.CreateAsync();
+
+                    // Get the user's content (items in the root folder and a collection of sub-folders)
+                    agolUser.userContent = await agolUser.portal.User.GetContentAsync();
                 }
                 catch (OperationCanceledException)
                 {
                     // user canceled the login
-                    throw new Exception("Portal log in was canceled.");
+                    MessageBox.Show("Portal log in was canceled.", "ArcGIS Online Login Canceled");
+                    return;
                 }
 
-                // show progress bar adn hide dowload window
-                mainWin.DownloadPanel.Visibility = Visibility.Visible;
-                downloading = true;
-                Hide();
-
-                // Create the portal
-                // Get the ArcGIS Online portal (will use credential from login above)
-                agolUser.portal = await ArcGISPortal.CreateAsync();
             }
 
 
@@ -203,6 +198,11 @@ namespace QBasket_demo
 
             dataFetcher.WorkerReportsProgress = false;
             dataFetcher.RunWorkerCompleted += FileFetchCompleted;
+
+            // Show progress bar/main window and hide download window
+            mainWin.DownloadPanel.Visibility = Visibility.Visible;
+            //mainWin.aoiWin.Show();
+            downloading = true;
 
             //Start the worker
             dataFetcher.RunWorkerAsync();
@@ -251,7 +251,7 @@ namespace QBasket_demo
 
                 if (dataStream != null)
                 {
-                    // Get the filename and add it tol list of downloaded files
+                    // Get the filename and add it to the list of downloaded files
                     if (info.bbox[0] < 0)
                         latMin = info.bbox[0].ToString("F2") + "S";
                     else
@@ -275,7 +275,7 @@ namespace QBasket_demo
                         + "_Zoom-" + info.zoomLvl + "_"
                         + latMin + "_" + lonMin + "_x_"
                         + latMax + "_" + lonMax + ".tiff";
-                    downloadedFiles.Add(filename);
+
 
                     // Download the file
                     using (FileStream output = File.OpenWrite(filename))
@@ -284,6 +284,7 @@ namespace QBasket_demo
                     // Close these up otherwise bad things will happen
                     response.Close();
                     dataStream.Close();
+                    downloadedFiles.Add(filename);
                 }   // end if data stream
             }   // end foreach download item
         }   // end Worker_FetchFiles
@@ -326,7 +327,7 @@ namespace QBasket_demo
                 if (dataStream != null)
                 {
                     #region GetFileName
-                    // Get the filename and add it to the list of downloaded files
+                    // Create the filename for this image
                     if (info.bbox[0] < 0)
                         latMin = info.bbox[0].ToString("F2") + "S";
                     else
@@ -351,64 +352,96 @@ namespace QBasket_demo
                             + latMin + "_" + lonMin + "_x_"
                             + latMax + "_" + lonMax + ".kmz";
                     #endregion
+                    Debug.WriteLine("Uploading " + filename);
 
-                    downloadedFiles.Add(filename);
+                    // Check for duplicate item filenames
+                    string msg = String.Empty;
+                    Boolean noDuplicates = true;
+
+                    // Check for a duplicate files in the files just uploaded
+                    foreach (String fileDownloaded in downloadedFiles)
+                    {
+                        if (String.Equals(fileDownloaded, filename))
+                        {
+                            noDuplicates = false;
+                            msg = "\n The file\n" + filename + "\nalready exists in download list";
+                            msg += "\n Item will not be created\n";
+                            MessageBox.Show(msg, "DUPLICATE DOWNLOADED FILE");
+                            break;
+                        }
+                    }
+
+                    foreach (PortalItem pItem in agolUser.userContent.Items)
+                    {
+                        if ((String.Equals(filename, pItem.Name)) ||
+                            (String.Equals(filename, pItem.Title)))
+                        {
+                            noDuplicates = false;
+                            msg = "\n" + filename;
+                            msg += "\n This item already exists in User AGOL Content\n";
+                            msg += "\n";
+                            msg += "\n Portal Item Details";
+                            msg += "\n Name:  " + pItem.Name;
+                            msg += "\n Title: " + pItem.Title;
+                            msg += "\n Item ID: " + pItem.ItemId;
+                            msg += "\n";
+                            MessageBox.Show(msg, "DUPLICATE PORTAL ITEM NAME");
+                            break;
+                        }
+                    }
 
                     // Generate portal item and content to upload
-                    try
+                    if (noDuplicates)
                     {
-                        if (agolUser.portal == null)
+                        Debug.WriteLine(filename + " is not a duplicate portal item");
+                        try
                         {
-                            MessageBox.Show("null portal\n + file: " + filename);
-                        }
-                        else
-                        {
-                            item = new PortalItem(agolUser.portal, PortalItemType.KML, filename)
+                            if (agolUser.portal == null)
                             {
-                                // Add a brief summary for the item
-                                Snippet = "NASA Snapshot image created by Q Basket",
-
-                                // Add a description of the item in more detail
-                                Description = "NASA snapshot KMZ file uploaded to ArcGIS Online user account by Q Basket"
-                            };
-
-                            if (item != null)
+                                MessageBox.Show("Null ArcGIS User portal\n + Writing file: " + filename);
+                            }
+                            else
                             {
-                                // provide relevant tags to the item
-                                item.Tags.Add("Snapshot");
-                                item.Tags.Add("NASA");
-                                item.Tags.Add("Q Basket");
-                                item.Tags.Add("Quartic Solutions");
-                                item.AccessInformation = "NASA GIBS SNAPSHOT SERVER";
-                                item.SpatialReferenceName = "WGS-84";
-                                item.Name = filename;
-                                item.Type = PortalItemType.KML;
-
-                                // add the new item (without content) to the portal   
-                                MediaTypeHeaderValue mediaType = new MediaTypeHeaderValue(uploadMIME);
-
-                                PortalItemContentParameters itemContent =
-                                    new PortalItemContentParameters(dataStream, filename, mediaType);
-
-                                // Launch the upload on a separate thread
-                                try
+                                item = new PortalItem(agolUser.portal, PortalItemType.KML, filename)
                                 {
+                                    // Add a brief summary for the item
+                                    Snippet = "NASA Snapshot image created by Q Basket",
+
+                                    // Add a description of the item in more detail
+                                    Description = "NASA snapshot KMZ file uploaded to ArcGIS Online user account by Q Basket"
+                                };
+
+                                if (item != null)
+                                {
+                                    // provide relevant tags to the item
+                                    item.Tags.Add("Snapshot");
+                                    item.Tags.Add("NASA");
+                                    item.Tags.Add("Q Basket");
+                                    item.Tags.Add("Quartic Solutions");
+                                    item.AccessInformation = "NASA GIBS SNAPSHOT SERVER";
+                                    item.SpatialReferenceName = "WGS-84";
+                                    item.Name = filename;
+                                    item.Type = PortalItemType.KML;
+
+                                    // add the new item (without content) to the portal
+                                    MediaTypeHeaderValue mediaType = new MediaTypeHeaderValue(uploadMIME);
+
+                                    PortalItemContentParameters itemContent =
+                                        new PortalItemContentParameters(dataStream, filename, mediaType);
+
+                                    // Launch the upload on a separate thread
                                     var t = Task.Run(() => agolUser.portal.User.AddPortalItemAsync(item, itemContent));
                                     t.Wait();
-                                }
-                                catch (Exception ex)
-                                {
-                                    string msg = "Error:\n" + ex.Message;
-                                    MessageBox.Show(msg, "ARCGIS ADD ITEM ERROR");
+                                    downloadedFiles.Add(filename);
                                 }
                             }
                         }
-                    }
-                    catch (Exception ex)
-                    {
-                        MessageBox.Show("ERROR: " + ex.ToString(), "Create portal item error");
-                    }
+                        catch (Exception ex)
+                        {
+                            MessageBox.Show("ERROR: " + ex.ToString(), "CREATE PORTAL ITEM ERROR");
+                        }
 
+                    }   // end if noDuplicates
                     // Close these up otherwise bad things will happen
                     response.Close();
                     dataStream.Close();
@@ -417,13 +450,16 @@ namespace QBasket_demo
             }   // end foreach download item
         }   // end Worker_AGOL
 
+
         // RunWorkerCompletedEventArgs callback
         private void FileFetchCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
 
-            // Turn downloading flag off and output downloaded file list 
+            // Turn downloading flag off and output downloaded file list
             mainWin.DownloadPanel.Visibility = Visibility.Collapsed;
             downloading = false;
+
+
             String str = "File(s) downloaded ";
             foreach (String fileStr in downloadedFiles)
             {
@@ -439,7 +475,7 @@ namespace QBasket_demo
             mainWin.wmts.downloadInfo.Clear();
             mainWin.confirmItemsWin.confirmList.Clear();
             mainWin.confirmItemsWin.ConfirmList.ItemsSource = null;
-            mainWin.confirmItemsWin.ConfirmList.ItemsSource = 
+            mainWin.confirmItemsWin.ConfirmList.ItemsSource =
                 mainWin.confirmItemsWin.confirmList;
             mainWin.confirmItemsWin.NumItems.Text = "0";
             mainWin.confirmItemsWin.TotalSize.Text = "0";
@@ -448,7 +484,8 @@ namespace QBasket_demo
             mainWin.aoiWin.CheckoutBtn.IsEnabled = false;
 
             if (mainWin.aoiWin != null)
-                mainWin.aoiWin.ShowDialog();
+                if (mainWin.aoiWin.Visibility == Visibility.Hidden)
+                    mainWin.aoiWin.ShowDialog();
 
             mainWin.aoiWin.Activate();
             mainWin.confirmItemsWin.Close();

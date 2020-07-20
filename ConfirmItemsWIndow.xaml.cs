@@ -111,9 +111,10 @@ namespace QBasket_demo
                     mainWin.aoiWin.ShowDialog();
                     mainWin.aoiWin.Activate();
                 }
-                catch
+                catch (Exception ex)
                 {
-                    Debug.WriteLine(" Confirm items - aoiWin closing down error");
+                    Debug.WriteLine("Confirm items - return to aoiWin error");
+                    Debug.WriteLine("Error: " + ex.Message);
                 }
             }
         }   // end Return_Click
@@ -123,7 +124,7 @@ namespace QBasket_demo
         private void Quit_Click(object sender, RoutedEventArgs e)
         {
             Application.Current.Shutdown();
-        }   // edn Quit_Click
+        }   // end Quit_Click
 
 
         // Update checkout lists and variables
@@ -166,7 +167,7 @@ namespace QBasket_demo
                         mainWin.wmts.downloadInfo.RemoveAt(i);
                     }
                 }
-            
+
                 // Update the Confirm list items displayed
                 ConfirmList.ItemsSource = null;
                 ConfirmList.ItemsSource = confirmList;

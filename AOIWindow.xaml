@@ -12,20 +12,20 @@
         Background="#DFEBF4"
         FontFamily="Montserrat"
         FontSize="10"
-        
+
         WindowStartupLocation="Manual"
         WindowStyle="SingleBorderWindow"
         Width="315"
         Height="535"
         ResizeMode="NoResize">
-    
+
     <Window.Style>
         <Style TargetType="{x:Type Window}">
             <Setter Property="WindowState" Value="Normal" />
             <Setter Property="WindowStyle" Value="SingleBorderWindow" />
         </Style>
     </Window.Style>
-    
+
     <!-- Margin : L T (R B) -->
     <Window.Resources>
         <Color x:Key="QuarticNavy"
@@ -185,7 +185,7 @@
                Content="Area of Interest" />
 
         <!-- Row 1 - Imagery title -->
-        <StackPanel Grid.Row="1" 
+        <StackPanel Grid.Row="1"
                     Grid.Column="0"
                     Grid.ColumnSpan="2"
                     Orientation="Vertical">
@@ -304,7 +304,7 @@
             </ComboBox.ItemTemplate>
         </ComboBox>
         </StackPanel>
-        <StackPanel Grid.Row="5" 
+        <StackPanel Grid.Row="5"
                     Grid.Column="0"
                     Margin="0,10"
                     Orientation="Vertical"
@@ -316,23 +316,23 @@
                 125MB
             </TextBlock>
         </StackPanel>
-            
-        <StackPanel Grid.Row="5" 
+
+        <StackPanel Grid.Row="5"
                 Grid.Column="1"
                 Margin="0,10"
                 Orientation="Vertical"
                 HorizontalAlignment="Center">
             <Label Content="Minimum"
                 Style="{StaticResource PanelLabel}"
-                HorizontalAlignment="Center" 
+                HorizontalAlignment="Center"
                 VerticalAlignment="Center"/>
             <TextBlock HorizontalAlignment="Center"
                     VerticalAlignment="Center">
             64 px x 64 px
             </TextBlock>
         </StackPanel>
-            
-        <StackPanel Grid.Row="6" 
+
+        <StackPanel Grid.Row="6"
                     Grid.Column="0"
                     Margin="0,0,0,20"
                     Orientation="Vertical"
@@ -345,14 +345,14 @@
             </TextBlock>
         </StackPanel>
 
-        <StackPanel Grid.Row="6" 
+        <StackPanel Grid.Row="6"
                     Grid.Column="1"
                     Margin="0,0,0,10"
                     Orientation="Vertical"
                     HorizontalAlignment="Center">
             <Label Content="Maximum"
                     Style="{StaticResource PanelLabel}"
-                    HorizontalAlignment="Center" 
+                    HorizontalAlignment="Center"
                     VerticalAlignment="Center"/>
             <TextBlock HorizontalAlignment="Center"
                        VerticalAlignment="Center">
@@ -373,7 +373,7 @@
                 ToolTipService.Placement="Left"
                 ToolTipService.HasDropShadow="True"
                 ToolTipService.ToolTip="Add this tile set to shopping cart"
-                Content="Save to Cart" 
+                Content="Save to Cart"
                 Click="ItemSaveBtn_Click"/>
 
         <Button x:Name="CheckoutBtn"
@@ -417,7 +417,7 @@
                 ToolTipService.ToolTip="Exit QBasket Demo"
                 Content="Quit" />
 <!--
-        <Image Source="QSolutions_small.png" 
+        <Image Source="QSolutions_small.png"
                    Margin="0,5,5,5"
                    Visibility="Collapsed"
                    Height="24"

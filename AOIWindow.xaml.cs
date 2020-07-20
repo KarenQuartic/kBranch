@@ -34,7 +34,7 @@ namespace QBasket_demo
 
         }   // end initialize
 
-        // Dynamic Panel variables 
+        // Dynamic Panel variables
         public class PanelVariables
         {
             private List<string> _resolutionList = new List<string>();
@@ -158,7 +158,7 @@ namespace QBasket_demo
         }   // end RedrawAOI
 
 
-        // Reset operational layers to previous state
+        // Reset operational layers to state before AOI window opened
         private void ResetMapLayers()
         {
             WmsLayer showLayers = new WmsLayer(mainWin.selectedLayers);
@@ -170,7 +170,7 @@ namespace QBasket_demo
         }
 
 
-        // Preload display layers
+        // Pre load display layers
         public void getDisplayLayers()
         {
             if (displayLayers == null)
@@ -188,7 +188,7 @@ namespace QBasket_demo
                     WmsLayer showLayer = new WmsLayer(layerList);
                     displayLayers.Add(showLayer);
                 }
-            }           
+            }
         }
 
         // Zoom Combo selection callback
@@ -212,7 +212,7 @@ namespace QBasket_demo
                     mainWin.ResetZoomLevels(ImageryTitle.SelectedIndex, "Jessie");
                 /*
              // Set the zoom level specific to image selected
-                mainWin.wmts.GetZoomRange(ImageryTitle.SelectedIndex, "Jessie", mainWin.wmts, 
+                mainWin.wmts.GetZoomRange(ImageryTitle.SelectedIndex, "Jessie", mainWin.wmts,
                                   mainWin.PIX_MIN, mainWin.PIX_MAX,
                                   double.Parse(MinLat.Text), double.Parse(MaxLat.Text),
                                   double.Parse(MinLon.Text), double.Parse(MaxLon.Text));
@@ -271,7 +271,6 @@ namespace QBasket_demo
 
                 // Reset Zoom levels for the new layer
                 mainWin.ResetZoomLevels(ImageryTitle.SelectedIndex, "Gilligan");
-                
             }
             /*
             mainWin.wmts.GetZoomRange(ImageryTitle.SelectedIndex, "Gilligan", mainWin.wmts,

@@ -18,6 +18,7 @@ namespace QBasket_demo
         private string _appID = "mJXUsUntsC9ygMva";
         private string _redirectUrl = "urn:ietf:wg:oauth:2.0:oob";
         private ServerInfo _portalServerInfo;
+        private PortalUserContent _userContent;
         private ArcGISPortal _portal;
         private Credential _credential;
 
@@ -29,6 +30,8 @@ namespace QBasket_demo
         { get => _redirectUrl; set { _redirectUrl = value; } }
         public ServerInfo portalServerInfo
         { get => _portalServerInfo; set { _portalServerInfo = value; } }
+        public PortalUserContent userContent
+        { get => _userContent; set { _userContent = value; } }
         public ArcGISPortal portal
         { get => _portal; set { _portal = value; } }
         public Credential credential
