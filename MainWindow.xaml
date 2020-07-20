@@ -479,7 +479,9 @@
                 <StackPanel Orientation="Horizontal"
                             Grid.Column="0"
                             Grid.Row="2"
+                            Margin="0,10"
                             HorizontalAlignment="Center">
+                    <!--
                     <Button x:Name="MainCheckoutBtn"
                             Content="Checkout"
                             Margin="10,0"
@@ -492,10 +494,11 @@
                             ToolTipService.ToolTip="Verify and download selections"
                             Click="CheckoutBtn_Click">
                     </Button>
+                    -->
                     <Button x:Name="QuitBtn"
-                            Content="Quit" 
+                            Content="Quit"
                             Margin="10,0"
-                            Width =" 70" 
+                            Width =" 70"
                             Height ="20"
                             ToolTipService.PlacementRectangle="10,10,50,50"
                             ToolTipService.Placement="Left"

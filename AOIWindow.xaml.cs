@@ -298,7 +298,7 @@ namespace QBasket_demo
                                         ZoomCombo.SelectedIndex, Date.Text, bbox);
             */
             CheckoutBtn.IsEnabled = true;
-            mainWin.MainCheckoutBtn.IsEnabled = true;
+            // mainWin.MainCheckoutBtn.IsEnabled = true;
 
         }   // end ItemSaveBtn_Click
 

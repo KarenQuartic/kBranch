@@ -12,7 +12,7 @@ namespace QBasket_demo
     /// <summary>
     /// Interaction logic for CheckoutWindow.xaml
     /// </summary>
-    /// 
+    ///
     public partial class ConfirmItemsWin : Window
     {
         // Old - public class ConfirmItem : INotifyPropertyChanged
@@ -62,9 +62,9 @@ namespace QBasket_demo
                 str += "\nSize: " + info.pixelWidth.ToString() + " px x "
                                   + info.pixelHeight.ToString() + " px";
                 str += "  -  " + info.nMBytes.ToString("F4") + " MB";
-                str += "\nExtent: " + info.bbox[0].ToString("F4") + ", " 
+                str += "\nExtent: " + info.bbox[0].ToString("F4") + ", "
                                     + info.bbox[1].ToString("F4") + "   "
-                                    + info.bbox[2].ToString("F4") + ", " 
+                                    + info.bbox[2].ToString("F4") + ", "
                                     + info.bbox[3].ToString("F4");
 
                 confirmList.Add(new ConfirmItem()
@@ -98,10 +98,12 @@ namespace QBasket_demo
                 mainWin.AOISelect.IsEnabled = true;
             }
 
+            /*
             if (confirmList.Count > 0)
                 mainWin.MainCheckoutBtn.IsEnabled = true;
             else
                 mainWin.MainCheckoutBtn.IsEnabled = false;
+            */
 
             // Return to AOI window
             if (mainWin.aoiWin != null)

@@ -36,6 +36,7 @@
     <Compile Remove="AOI_draw - Copy.cs" />
     <Compile Remove="AOI_draw Save.cs" />
     <Compile Remove="AOI_draw_new.cs" />
+    <Compile Remove="AOI_Panel.xaml.cs" />
     <Compile Remove="ChildWindow.xaml.cs" />
     <Compile Remove="Interactivity.cs" />
     <Compile Remove="IReadOnlyList.cs" />
@@ -60,6 +61,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Page Remove="AOI_Panel.xaml" />
     <Page Remove="ChildWindow.xaml" />
     <Page Remove="ProgressBarWindow.xaml" />
     <Page Remove="WMTS_Window.xaml" />
