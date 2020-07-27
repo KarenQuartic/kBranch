@@ -16,7 +16,7 @@
 
         WindowStyle="SingleBorderWindow"
         WindowStartupLocation="Manual"
-        Width="315"
+        Width="365"
         Height="535"
         ResizeMode="NoResize"
         AllowsTransparency="False">
@@ -154,7 +154,7 @@
     <Border Style="{StaticResource BlueBorder}">
         <Grid>
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto" MaxWidth="315" />
+                <ColumnDefinition Width="Auto" MaxWidth="365" />
             </Grid.ColumnDefinitions>
 
             <Grid.RowDefinitions>
@@ -165,7 +165,9 @@
                 <!-- Row 2 - Item list panel -->
                 <RowDefinition Height="350" MaxHeight="350" />
                 <!-- Row 3 - Button Panel -->
-                <RowDefinition Height="75" MaxHeight="75" />
+                <RowDefinition Height="50" MaxHeight="50" />
+                <!-- Row 3 - Button Panel -->
+                <RowDefinition Height="50" MaxHeight="50" />
                 <!-- Row 4 - Logo Button -->
                 <RowDefinition Height="40" MaxHeight="40" />
             </Grid.RowDefinitions>
@@ -214,7 +216,7 @@
             <Grid Grid.Row="2"
                   Grid.Column="0">
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="255" MaxWidth="255" />
+                    <ColumnDefinition Width="305" MaxWidth="305" />
                     <ColumnDefinition Width="60" MaxWidth="60" />
                 </Grid.ColumnDefinitions>
                 <Grid.RowDefinitions>
@@ -228,13 +230,13 @@
                        Grid.ColumnSpan="2"
                        VerticalContentAlignment="Center"
                        HorizontalAlignment="Left"
-                       Content="Check item(s) then Delete to update"/>
+                       Content="Select an item to delete it"/>
 
                 <ListBox  x:Name="ConfirmList"
                           Height="300"
-                           Grid.Column="0"
-                           Grid.Row="1"
-                           Grid.ColumnSpan="2">
+                          Grid.Column="0"
+                          Grid.Row="1"
+                          Grid.ColumnSpan="2">
                     <ListBox.ItemContainerStyle>
                         <Style TargetType="{x:Type ListBoxItem}">
                             <Setter Property="IsSelected"
@@ -243,8 +245,10 @@
                     </ListBox.ItemContainerStyle>
                     <ListBox.ItemTemplate>
                         <DataTemplate >
-                            <CheckBox Content="{Binding name}"
+                            <StackPanel Orientation="Horizontal">
+                                <CheckBox Content="{Binding name}"
                                       IsChecked="{Binding delete}"/>
+                            </StackPanel>
                         </DataTemplate>
                     </ListBox.ItemTemplate>
                 </ListBox>
@@ -254,34 +258,37 @@
             <StackPanel Orientation="Horizontal"
                         HorizontalAlignment="Center"
                         VerticalAlignment="Center"
-                        Margin="0,15"
                         Grid.Row="3"
                         Grid.Column="0">
                 <Button x:Name="DeleteBtn"
                         Content="Delete"
                         Height="20"
                         Width="60"
-                        Margin="5"
+                        Margin="25,0"
                         Click="DeleteBtn_Click"/>
                 <Button x:Name="Download"
                         Content="Download"
                         Height="20"
                         Width="60"
-                        Margin="5"
+                        Margin="25,0"
                         Click="Download_Click"/>
                 <Button x:Name="ReturnBtn"
-                        Content="Return"
+                        Content="Back"
                         Height="20"
                         Width="60"
-                        Margin="5"
+                        Margin="25,0"
                         Click="Return_Click"/>
-                <Button x:Name="QuitBtn"
-                        Content="Quit"
-                        Height="20"
-                        Width="60"
-                        Margin="5"
-                        Click="Quit_Click"/>
             </StackPanel>
+            <Button x:Name="QuitBtn"
+                    Grid.Row="4"
+                    Content="Exit"
+                    HorizontalAlignment="Right"
+                    VerticalAlignment="Top"
+                    Height="20"
+                    Width="60"
+                    Margin="0,0,42.25,0"
+                    Click="Quit_Click"/>
+
 
             <!-- Row 4 Quartic logo -->
             <Image Source="QSolutions_small.png"

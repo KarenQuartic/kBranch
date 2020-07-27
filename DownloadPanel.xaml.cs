@@ -1,4 +1,7 @@
-﻿using Esri.ArcGISRuntime.Portal;
+﻿
+using System.Text;
+using System.Windows.Controls;
+using Esri.ArcGISRuntime.Portal;
 using Esri.ArcGISRuntime.Security;
 using System;
 using System.Collections.Generic;
@@ -13,36 +16,25 @@ using System.Windows.Forms;
 using static QBasket_demo.MainWindow;
 using MessageBox = System.Windows.MessageBox;
 
-
-// download filenames needs to be better generalized to ensure no overwriting
-// need to check if Item exists
 namespace QBasket_demo
 {
+
     /// <summary>
-    /// Interaction logic for Window1.xaml
+    /// Interaction logic for DownloadPanel.xaml
     /// </summary>
-    public partial class DownloadWindow : Window
+    public partial class DownloadPanel : System.Windows.Controls.UserControl
     {
         bool downloading = false;
         String downloadDir = String.Empty;
         List<String> downloadedFiles = new List<string>();
         BackgroundWorker dataFetcher;
-
         public AGOL_User agolUser = new AGOL_User();
-        //Task getPortal = agolUser.GetUserPortal();
 
-        public DownloadWindow()
+
+        public DownloadPanel()
         {
             InitializeComponent();
-
-            // Initialize  in UI items
-            OutList.ItemsSource = mainWin.confirmItemsWin.confirmList;
-            Out_NumItems.Text = mainWin.confirmItemsWin.NumItems.Text;
-            Out_TotalSize.Text = mainWin.confirmItemsWin.TotalSize.Text;
-
-        }   // end DownloadWindow
-
-
+        }
         // Exit button callback
         private void ExitBtn_Click(object sender, RoutedEventArgs e)
         {
@@ -71,7 +63,7 @@ namespace QBasket_demo
             }
             if (!carryOn)
             {
-                Hide();
+                //Hide();
             }
         }   // endCancelBtn_Click
 
@@ -184,7 +176,8 @@ namespace QBasket_demo
                 Debug.WriteLine("Credential request info set");
 
                 Debug.WriteLine("Have Credential - continuing");
-                try {
+                try
+                {
                     // Create the portal
                     // Get the ArcGIS Online portal (will use credential from login above)
                     Debug.WriteLine("Creating the portal");
@@ -492,7 +485,7 @@ namespace QBasket_demo
                 str = "Imagery files saved to " + downloadDir;
             else
                 str = "Imagery files uploaded to ArcGIS Online";
-                foreach (String fileStr in downloadedFiles)
+            foreach (String fileStr in downloadedFiles)
             {
                 str += "\t" + fileStr + "\n";
             }
@@ -512,7 +505,6 @@ namespace QBasket_demo
             mainWin.confirmItemsWin.TotalSize.Text = "0";
             mainWin.confirmItemsWin.Download.IsEnabled = false;
 
-            // PANEL - reset to show correct window
             mainWin.Activate();
             mainWin.aoiWin.CheckoutBtn.IsEnabled = false;
 
@@ -527,7 +519,5 @@ namespace QBasket_demo
             mainWin.confirmItemsWin.Close();
 
         }   // end Worker_RunWorkerCompleted
-    } // end DownloadWindow class
-
-}   // end namespace
-
+    } // end DownloadPanel class
+}

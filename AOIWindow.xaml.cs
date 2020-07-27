@@ -97,7 +97,7 @@ namespace QBasket_demo
         }   // end ReturnBtn_Click
 
 
-        // Executed when any change is made to any Extent textbox
+        // Executed when any change is made to any Extent text box
         private void Extent_Changed(object sender, RoutedEventArgs e)
         {
             if (mainWin.haveSketch && mainWin.haveLayer)
@@ -170,7 +170,7 @@ namespace QBasket_demo
         }
 
 
-        // Pre load display layers
+        // Preload display layers
         public void getDisplayLayers()
         {
             if (displayLayers == null)
@@ -190,6 +190,7 @@ namespace QBasket_demo
                 }
             }
         }
+
 
         // Zoom Combo selection callback
         private void Zoom_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -234,9 +235,12 @@ namespace QBasket_demo
                 zoomIdx = ZoomCombo.SelectedIndex;
                 if (zoomIdx < 0) zoomIdx = 1;
 
+                // Reset zoom index to correct wmts index
                 if (mainWin.wmts.layerTileSets != null && mainWin.wmts.layerTileSets.Count > 0)
                 {
-                    if (mainWin.wmts.layerTileSets[idx].resTypes != null && mainWin.wmts.layerTileSets[idx].resTypes.Count > 0)
+                    zoomIdx += mainWin.wmts.layerTileSets[idx].minZoom;
+                    if (mainWin.wmts.layerTileSets[idx].resTypes != null
+                        && mainWin.wmts.layerTileSets[idx].resTypes.Count > 0)
                     {
                         res = mainWin.wmts.layerTileSets[idx].resTypes[zoomIdx].resolution;
                         numLatPix = 10 * Convert.ToInt32(latDiff / res);
@@ -308,5 +312,10 @@ namespace QBasket_demo
         {
             Application.Current.Shutdown();
         }   // end QAOIWindow_Closing
+
+        private void AOI_SelectedDateChanged(object sender, SelectionChangedEventArgs e)
+        {
+
+        }
     }   // end  partial class AOIWindow
 }   // end namespace

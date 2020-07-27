@@ -67,6 +67,9 @@ namespace QBasket_demo
             AOI_outline.Color = Color.Red;
             AOI_outline.Width = 2;
 
+            // set the date on the display
+            startDate_DP.DisplayDateEnd = DateTime.Now;
+
         }   // end Initialize AIO
 
         /// <summary>
@@ -130,7 +133,7 @@ namespace QBasket_demo
 
                     // Let the user draw on the map view using the chosen sketch mode
                     Esri.ArcGISRuntime.Geometry.Geometry geometry =
-                     await BasemapView.SketchEditor.StartAsync(creationMode, true);
+                       await BasemapView.SketchEditor.StartAsync(creationMode, true);
 
                     // Create and add a graphic from the geometry the user drew
                     Graphic graphic = CreateGraphic(geometry);
@@ -201,7 +204,7 @@ namespace QBasket_demo
                         String year = date.Year.ToString("D4");
                         String month = date.Month.ToString("D2");
                         String day = date.Day.ToString("D2");
-                        aoiWin.Date.Text = year + "-" + month + "-" + day;
+                        aoiWin.AOI_Date.Text = year + "-" + month + "-" + day;
 
                         // Convert envelope to pixel values - currently degrees
                         string str = AOIEnvelope.Width.ToString("F4") + " x " + AOIEnvelope.Height.ToString("F4");
@@ -290,9 +293,9 @@ namespace QBasket_demo
             // DateTime end = endDate_DP.DisplayDate;   // add back in when animation is considered
             // str = "Start Date:" + start.Date + "\n" +
             //       "End Date: " + end.Date;
-            str = "Date is now\n" + start.Date;
+            str = "Date is now\n" + startDate_DP.DisplayDate;
             MessageBox.Show(str, "NEW DATE");
-            UpdateDatesBtn.IsEnabled = false;
+            //UpdateDatesBtn.IsEnabled = false;
         }   // end ReloadLayerBtn_Click
 
 
@@ -315,10 +318,8 @@ namespace QBasket_demo
 
         private void SelectedDateChanged(object sender, SelectionChangedEventArgs e)
         {
-            if (UpdateDatesBtn != null)
-            {
-                UpdateDatesBtn.IsEnabled = true;
-            }
+            startDate_DP.Text = startDate_DP.SelectedDate.ToString();
+
         }   // end SelectedDateChanged
 
 
@@ -589,14 +590,22 @@ namespace QBasket_demo
 
             }   // end find min and max zoom
 
-            aoiWin.panelVars.resolutionList[wmts.layerTileSets[idx].minZoom] += " - Min";
-            aoiWin.panelVars.resolutionList[wmts.layerTileSets[idx].maxZoom] += " - Max";
+            // Set the resolutionList
+            if (aoiWin.panelVars.resolutionList != null)
+                aoiWin.panelVars.resolutionList.Clear();
+            else
+                aoiWin.panelVars.resolutionList = new List<string>();
+
+            for (i = wmts.layerTileSets[idx].minZoom; i <= wmts.layerTileSets[idx].maxZoom; i++)
+                aoiWin.panelVars.resolutionList.Add(i.ToString());
             aoiWin.panelVars.resolutionList[0] = flag;
             aoiWin.ZoomCombo.ItemsSource = aoiWin.panelVars.resolutionList;
             aoiWin.ZoomCombo.SelectedIndex = 0;
 
+            int zoomRange = wmts.layerTileSets[idx].maxZoom - wmts.layerTileSets[idx].minZoom;
+
             // Update image pixel size
-            int selectedIdx = aoiWin.ZoomCombo.SelectedIndex;
+            int selectedIdx = aoiWin.ZoomCombo.SelectedIndex + wmts.layerTileSets[idx].minZoom;
             int numLatPix = 10 * Convert.ToInt32(latDiff * wmts.layerTileSets[idx].resTypes[selectedIdx].resolution);
             int numLonPix = 10 * Convert.ToInt32(lonDiff * wmts.layerTileSets[idx].resTypes[selectedIdx].resolution);
             string str = numLatPix.ToString() + "px x " + numLonPix.ToString() + "px";
@@ -614,7 +623,7 @@ namespace QBasket_demo
         public void AddDownloadItem()
         {
             int idx, titleIdx;
-            int zoomIdx, minZoom, maxZoom;
+            int zoomIdx;
             int pixelWidth, pixelHeight;
             double latMin, lonMin;
             double latMax, lonMax;
@@ -628,20 +637,12 @@ namespace QBasket_demo
             lonMin = Convert.ToDouble(aoiWin.MinLon.Text);
             lonMax = Convert.ToDouble(aoiWin.MaxLon.Text);
 
-            zoomIdx = aoiWin.ZoomCombo.SelectedIndex;
-            minZoom = wmts.layerTileSets[titleIdx].minZoom;
-            maxZoom = wmts.layerTileSets[titleIdx].maxZoom;
-            if (zoomIdx == 0)
+            if (aoiWin.ZoomCombo.SelectedIndex == 0)
                 MessageBox.Show("Please select a zoom level",
-                                 "ZOOM LEVEL SELECTION ERROR");
-            else if (zoomIdx > maxZoom)
-                MessageBox.Show("Pixel extent exceeds maximum - select a lower zoom level",
-                                 "ZOOM LEVEL SELECTION ERROR");
-            else if (zoomIdx < minZoom)
-                MessageBox.Show("Pixel extent below minimum - select a higher zoom level",
                                  "ZOOM LEVEL SELECTION ERROR");
             else
             {
+                zoomIdx = aoiWin.ZoomCombo.SelectedIndex + wmts.layerTileSets[titleIdx].minZoom;
                 // Check if item is already in the list
                 noDuplicate = true;
                 foreach (WMTS.DownloadLayerInfo info in wmts.downloadInfo)
@@ -651,7 +652,7 @@ namespace QBasket_demo
                         info.zoomLvl == zoomIdx &&
                         info.bbox[0] == latMin && info.bbox[1] == lonMin &&
                         info.bbox[2] == latMax && info.bbox[3] == lonMax &&
-                        String.Equals(info.date,aoiWin.Date.Text) &&
+                        String.Equals(info.date,aoiWin.AOI_Date.Text) &&
                         String.Equals(info.name, wmts.layerTileSets[titleIdx].layerName) &&
                         String.Equals(info.latency, wmsUriStartup.latency) &&
                         String.Equals(info.crs,wmsUriStartup.EPSG) )
@@ -696,27 +697,29 @@ namespace QBasket_demo
                     wmts.downloadInfo[idx].name = wmts.layerTileSets[titleIdx].layerName;
                     wmts.downloadInfo[idx].latency = wmsUriStartup.latency;
                     wmts.downloadInfo[idx].crs = wmsUriStartup.EPSG;
-                    wmts.downloadInfo[idx].zoomLvl = aoiWin.ZoomCombo.SelectedIndex;
+                    wmts.downloadInfo[idx].zoomLvl = zoomIdx;
                     wmts.downloadInfo[idx].resolution = wmts.layerTileSets[titleIdx].resTypes[zoomIdx].resolution;
                     wmts.downloadInfo[idx].tileHeight = wmts.layerTileSets[titleIdx].tileHeight;
                     wmts.downloadInfo[idx].tileWidth = wmts.layerTileSets[titleIdx].tileWidth;
-                    wmts.downloadInfo[idx].matrixWidth = wmts.layerTileSets[titleIdx].resTypes[aoiWin.ZoomCombo.SelectedIndex].matrixWidth;
+                    wmts.downloadInfo[idx].matrixWidth = wmts.layerTileSets[titleIdx].resTypes[zoomIdx].matrixWidth;
                     wmts.downloadInfo[idx].matrixHeight = wmts.downloadInfo[idx].matrixWidth;
                     wmts.downloadInfo[idx].pixelWidth = pixelWidth;
                     wmts.downloadInfo[idx].pixelHeight = pixelHeight;
                     wmts.downloadInfo[idx].nMBytes = (Convert.ToDouble(pixelHeight * pixelWidth * 3) / 8.0) / 1048576.0;
 
                     // Make sure the date is in the correct format yyyy-mm-dd
-                    wmts.downloadInfo[idx].date = aoiWin.Date.Text;
-                    String[] words = aoiWin.Date.Text.Split("-");
-                    int year = Convert.ToInt32(words[0]);
-                    int month = Convert.ToInt32(words[1]);
-                    int day = Convert.ToInt32(words[2]);
-                    wmts.downloadInfo[idx].date = year.ToString("D4") + "-" + month.ToString("D2") + "-" + day.ToString("D2");
+                    wmts.downloadInfo[idx].date = aoiWin.AOI_Date.Text;
+                    String[] words = aoiWin.AOI_Date.Text.Split("/");
+                    int month = Convert.ToInt32(words[0]);
+                    int day = Convert.ToInt32(words[1]);
+                    int year = Convert.ToInt32(words[2]);
+                    wmts.downloadInfo[idx].date = year.ToString("D4") + "-"
+                                                  + month.ToString("D2") + "-"
+                                                  + day.ToString("D2");
 
                     str = wmts.downloadInfo[idx].title + "\n";
                     str += "Zoom Level: " + wmts.downloadInfo[idx].zoomLvl.ToString();
-                    str += "\tDate: " + wmts.downloadInfo[idx].date;
+                    str += "\tDate: " + aoiWin.AOI_Date.Text;
                     str += "\nSize: " + wmts.downloadInfo[idx].pixelWidth.ToString() + " px x "
                                       + wmts.downloadInfo[idx].pixelHeight.ToString() + " px";
                     str += "  -  " + wmts.downloadInfo[idx].nMBytes.ToString("F4") + " MB";

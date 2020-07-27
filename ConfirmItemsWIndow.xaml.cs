@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.Windows;
 using Esri.ArcGISRuntime.Mapping;
 using static QBasket_demo.MainWindow;
+using static QBasket_demo.AOIWindow;
 
 
 namespace QBasket_demo
@@ -56,9 +57,12 @@ namespace QBasket_demo
 
             foreach (WMTS.DownloadLayerInfo info in mainWin.wmts.downloadInfo)
             {
+                // Reformat info date to mm/dd/yyyy format
+                string date = info.date;
+
                 str = info.title + "\n";
                 str += "Zoom Level: " + info.zoomLvl.ToString();
-                str += "\tDate: " + info.date;
+                str += "\tDate: " + date;
                 str += "\nSize: " + info.pixelWidth.ToString() + " px x "
                                   + info.pixelHeight.ToString() + " px";
                 str += "  -  " + info.nMBytes.ToString("F4") + " MB";
@@ -193,16 +197,77 @@ namespace QBasket_demo
             // Process the confirmed layers
             // Show format dialog
             DownloadWindow downloadWin = new DownloadWindow();
+            //DownloadPanel downloadWin = new DownloadPanel();
+            //downloadWin.Visibility = Visibility.Visible;
+            
             downloadWin.Top = mainWin.Top;
             downloadWin.Left = mainWin.Left;
             downloadWin.ShowDialog();
             downloadWin.Activate();
+            
         }   // end Download_Click
 
 
         private void QBasketConfirmItems_Closing(object sender, CancelEventArgs e)
         {
 
+        }
+
+        private void Item_Delete_Button_Click(object sender, RoutedEventArgs e)
+        {
+
+            for (int i = 0; i < ConfirmList.SelectedItems.Count; i++)
+                Debug.WriteLine(ConfirmList.SelectedItems[i]);
+
+            int num2Delete = 0;
+
+            // Get the number of items to delete
+            for (int i = 0; i < confirmList.Count; i++)
+                if (confirmList[i].delete == true)
+                    num2Delete++;
+
+            // If the whole list is to be deleted, then delete it
+            // otherwise check items in the list one by one
+            if (num2Delete == confirmList.Count)
+            {
+                confirmList.Clear();
+                mainWin.wmts.downloadInfo.Clear();
+                mainWin.aoiWin.CheckoutBtn.IsEnabled = false;
+
+                // Update the Confirm UI displayed
+                ConfirmList.ItemsSource = null;
+                ConfirmList.ItemsSource = confirmList;
+                NumItems.Text = "0";
+                TotalSize.Text = "0";
+                if (mainWin.aoiWin.IsVisible == false)
+                    mainWin.aoiWin.ShowDialog();
+                mainWin.aoiWin.Activate();
+                Close();
+            }
+
+            // Remove the items selected for deletion
+            else
+            {
+                for (int i = 0; i < confirmList.Count; i++)
+                {
+                    if (confirmList[i].delete)
+                    {
+                        confirmList.RemoveAt(i);
+                        mainWin.wmts.downloadInfo.RemoveAt(i);
+                    }
+                }
+
+                // Update the Confirm list items displayed
+                ConfirmList.ItemsSource = null;
+                ConfirmList.ItemsSource = confirmList;
+
+                // Update summary items
+                NumItems.Text = confirmList.Count.ToString();
+                double sum = 0;
+                foreach (WMTS.DownloadLayerInfo item in mainWin.wmts.downloadInfo)
+                    sum += item.nMBytes;
+                TotalSize.Text = sum.ToString("F4") + " MB";
+            }
         }
     }   // end ConfirmItems window class
 

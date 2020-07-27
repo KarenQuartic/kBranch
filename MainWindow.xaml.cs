@@ -1,25 +1,4 @@
-﻿
-// TODO List
-//Bugs -
-// AOIwin -> Draw -> Select - errors on select null list
-// Error after Besty - happens when no layers are selected after initial set up
-// WHen the imagery title list is null - xaml throws a binding error because it cannot find
-//      its respective image title list - > never let list get null!
-//-----------------------------------------
-// Is the adopted wms vm the best - can the vm be reimplemented using a
-//  similar approach to the confirmItems Panel Checkbox list?
-//
-// Sort imagery list - list is sorted but lose something
-// above may help
-// change date on aoiwin to date selection - not text
-// need to do to make sure date is always in correct format
-//
-// Responsive ui - ongoing updates
-// Add date range option
-// add wmts output
-// 
-
-using Esri.ArcGISRuntime.Geometry;
+﻿using Esri.ArcGISRuntime.Geometry;
 using Esri.ArcGISRuntime.Mapping;
 using Esri.ArcGISRuntime.Ogc;
 using Esri.ArcGISRuntime.UI;
@@ -65,12 +44,11 @@ namespace QBasket_demo
         private DateTime _firstDate = DateTime.Now;
 
         // Windows
-        public StartUpWindow winStartUp;
+        //public StartUpWindow winStartUp;
         public static MainWindow mainWin;
         public AOIWindow aoiWin;
         public ConfirmItemsWin confirmItemsWin;
-        public DownloadWindow outputFormatWin;
-
+        
         // Flags to simplify element state checking
         public bool haveSketch = false;
         public bool haveLayer = false;
@@ -87,6 +65,7 @@ namespace QBasket_demo
             InitializeComponent();
             mainWin = this;
 
+            /*
             // Create and show start up dialog
             winStartUp = new StartUpWindow();
             winStartUp.ShowDialog();
@@ -95,13 +74,12 @@ namespace QBasket_demo
             // Exit application if the user exited the startup window
             if (winStartUp == null)
                 Application.Current.Shutdown();
-
-            // Process Starup window into meaningful URIs
-            GetWmsUri();
+            */
+            // Set Wms Capability uri
+            SetWmsUri();
 
             // Initialize the Main window model view
             startDate_DP.SelectedDate = _firstDate;
-            // endDate_DP.SelectedDate = _today;    // add back in when animation is considered
             InitializeWMSLayer_VM();
 
             // Set map to current location
@@ -111,12 +89,15 @@ namespace QBasket_demo
             BasemapView.LocationDisplay.InitialZoomScale = 2000000;
             BasemapView.LocationDisplay.IsEnabled = false;
 
-            // Put the main window on top and set flags
+            // Activate main window and set flags
             mainWin.Activate();
             haveSketch = false;
             haveLayer = false;
 
-            // Initialize AOI sketch - in AOI_draw.cs
+            // Initialize panels: AOI Win, Confirm, and Download - PANEL
+            // Set panel visibility
+
+            // Initialize AOI sketch editor - in AOI_draw.cs
             InitializeAOIsketch();
 
             // Create and hide AOI Window
@@ -127,7 +108,7 @@ namespace QBasket_demo
 
         /// <summary>
         /// Open WMS service and store the list of imagery
-        /// perserving heirarchy, if any
+        /// preserving hierarchy, if any
         /// Source: Runtime wms Service catalog
         /// MOD - pass in serviceurl
         /// </summary>
@@ -197,28 +178,11 @@ namespace QBasket_demo
         ///
         /// Use start up variables to define wms Uris
         #region NASA
-        public void GetWmsUri()
+        public void SetWmsUri()
         {
-            // Retrieve URL components from the start up window
-            // Set latency
-            if (winStartUp.bestRB.IsChecked == true)
-                wmsUriStartup.latency = "best";
-            else if (winStartUp.stdRB.IsChecked == true)
-                wmsUriStartup.latency = "std";
-            else if (winStartUp.nrtRB.IsChecked == true)
-                wmsUriStartup.latency = "nrt";
-            else
-                wmsUriStartup.latency = "all";
-
-            // Set projection
-            if (winStartUp.epsg4326_RB.IsChecked == true)
-                wmsUriStartup.EPSG = "epsg4326";
-            else if (winStartUp.epsg3857_RB.IsChecked == true)
-                wmsUriStartup.EPSG = "epsg3857";
-            else if (winStartUp.epsg3413_RB.IsChecked == true)
-                wmsUriStartup.EPSG = "epsg3413";
-            else if (winStartUp.epsg3031_RB.IsChecked == true)
-                wmsUriStartup.EPSG = "epsg3031";
+            // Set latency and projection
+            wmsUriStartup.latency = "best";
+            wmsUriStartup.EPSG = "epsg4326";
 
             // Set and parse dates
             DateTime date = startDate_DP.SelectedDate.Value;
@@ -233,7 +197,7 @@ namespace QBasket_demo
                 wmsUriStartup.EPSG + "/" + wmsUriStartup.latency + "/" +
                 wmsUriStartup.service + ".cgi?SERVICE=WMS&REQUEST=GetCapabilities&VERSION=1.3.0";
 
-        }   // end GetWmsUri
+        }   // end SetWmsUri
         #endregion NASA
 
 
@@ -277,15 +241,6 @@ namespace QBasket_demo
             }
 
             // Get a list of selected LayerInfos
-            /*
-           selectedLayers = new List<WmsLayerInfo>();
-           foreach (LayerInfoVM layer in productList)
-           {
-               if (layer.Selected == true)
-                   selectedLayers.Add(layer.Info);
-           }
-               */
-
             selectedLayers =
                new List<WmsLayerInfo>(productList.Where(checkBox => checkBox.Selected).Select(checkBox => checkBox.Info).ToList());
 
@@ -366,7 +321,7 @@ namespace QBasket_demo
         public string startDate = String.Empty;
         public string endDate = String.Empty;
 
-        // Defined in GetWmsUri
+        // Defined in SetWmsUri
         public string value = String.Empty;
     }   // end timeClass
 
@@ -483,10 +438,6 @@ namespace QBasket_demo
         }   // end BuildLayerInfoList
 
 
-
-
-
-
         // Standard event parser -
         //      calls property's respective PropertyChangedEventArgs
         protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
@@ -499,8 +450,6 @@ namespace QBasket_demo
 
 
 /* GIBS defaults from worldview code
-   arctic_bad_size = 9949
-  antarctic_bad_size = 4060
   geographic_bad_size = 12088
 
   param_dict = {
