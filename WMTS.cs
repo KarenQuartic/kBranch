@@ -375,7 +375,7 @@ namespace QBasket_demo
                 wmts.downloadInfo.Add(new DownloadLayerInfo());
                 idx = wmts.downloadInfo.Count - 1;
 
-                // Store layer variables required for later processing    
+                // Store layer variables required for later processing
                 wmts.downloadInfo[idx].bbox[0] = bbox[0];
                 wmts.downloadInfo[idx].bbox[1] = bbox[1];
                 wmts.downloadInfo[idx].bbox[2] = bbox[2];

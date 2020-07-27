@@ -1,25 +1,4 @@
-﻿
-// TODO List
-//Bugs - 
-// AOIwin -> Draw -> Select - errors on select null list
-// Error after Besty - happens when no layers are selected after initial set up
-// WHen the imagery title list is null - xaml throws a binding error becuase it cannot find 
-//      its respective image title list - > never let list get null!
-//-----------------------------------------
-// Is the adopted wms vm the best - can the vm be reimplemented using a
-//  similar approach to the confirmItems Panel Checkbox list?
-//
-// Sort imagery list - list is sorted but lose something 
-// above may help
-// change date on aoiwin to date selection - not text
-// need to do to make sure date is always in correct format
-//
-// Responsive ui - ongoing updates
-// Add date range option
-// add wmts output
-//      
-
-using Esri.ArcGISRuntime.Geometry;
+﻿using Esri.ArcGISRuntime.Geometry;
 using Esri.ArcGISRuntime.Mapping;
 using Esri.ArcGISRuntime.Ogc;
 using Esri.ArcGISRuntime.UI;
@@ -35,7 +14,7 @@ using System.Windows;
 namespace QBasket_demo
 {
     /// Namespace Classes
-    /// 
+    ///
     /// <summary>
     /// Logic for MainWindow.xaml
     /// </summary>
@@ -65,12 +44,11 @@ namespace QBasket_demo
         private DateTime _firstDate = DateTime.Now;
 
         // Windows
-        public StartUpWindow winStartUp;
+        //public StartUpWindow winStartUp;
         public static MainWindow mainWin;
         public AOIWindow aoiWin;
         public ConfirmItemsWin confirmItemsWin;
-        public DownloadWindow outputFormatWin;
-
+        
         // Flags to simplify element state checking
         public bool haveSketch = false;
         public bool haveLayer = false;
@@ -87,22 +65,21 @@ namespace QBasket_demo
             InitializeComponent();
             mainWin = this;
 
+            /*
             // Create and show start up dialog
             winStartUp = new StartUpWindow();
             winStartUp.ShowDialog();
-            // winStartUp.Topmost = true;
             winStartUp.Activate();
 
             // Exit application if the user exited the startup window
             if (winStartUp == null)
                 Application.Current.Shutdown();
-
-            // Process Starup window into meaningful URIs
-            GetWmsUri();
+            */
+            // Set Wms Capability uri
+            SetWmsUri();
 
             // Initialize the Main window model view
             startDate_DP.SelectedDate = _firstDate;
-            // endDate_DP.SelectedDate = _today;    // add back in when animation is considered
             InitializeWMSLayer_VM();
 
             // Set map to current location
@@ -112,12 +89,15 @@ namespace QBasket_demo
             BasemapView.LocationDisplay.InitialZoomScale = 2000000;
             BasemapView.LocationDisplay.IsEnabled = false;
 
-            // Put the main window on top and set flags
+            // Activate main window and set flags
             mainWin.Activate();
             haveSketch = false;
             haveLayer = false;
 
-            // Initialize AOI sketch - in AOI_draw.cs
+            // Initialize panels: AOI Win, Confirm, and Download - PANEL
+            // Set panel visibility
+
+            // Initialize AOI sketch editor - in AOI_draw.cs
             InitializeAOIsketch();
 
             // Create and hide AOI Window
@@ -128,7 +108,7 @@ namespace QBasket_demo
 
         /// <summary>
         /// Open WMS service and store the list of imagery
-        /// perserving heirarchy, if any
+        /// preserving hierarchy, if any
         /// Source: Runtime wms Service catalog
         /// MOD - pass in serviceurl
         /// </summary>
@@ -168,22 +148,25 @@ namespace QBasket_demo
                     LayerInfoVM.BuildLayerInfoList(new LayerInfoVM(layerInfo, null, false), _layerInfoOC);
 
                 // NASA GIBS Specific
-                ProductLabel.Content = _layerInfoOC[0].Info.Title;
+                #region NASA
+                string epsg = wmsUriStartup.EPSG.Substring(0, 4) + ":"
+                              + wmsUriStartup.EPSG.Substring(4, 4);
+                ProductLabel.Content = "NASA GIBS for EODIS: "
+                                       + wmsUriStartup.latency.ToUpper() + " - "
+                                       + epsg.ToUpper();
                 Sort_NASA_GIBS(_layerInfoOC, out temp);
                 _layerInfoOC.Clear();
 
                 foreach (LayerInfoVM layerInfo in temp)
                     _layerInfoOC.Add(layerInfo);
+                #endregion NASA
 
                 // Update the map display based on the viewModel.
                 UpdateViewModel(_layerInfoOC);
 
-                // Update UI element
-                /*
-                ProductLabel.Content = "NASA GIBS - " + wmsUriStartup.EPSG + " - "
-                                                      + wmsUriStartup.latency;
-                */
-                ProductTreeView.ItemsSource = _layerInfoOC;
+                // Update Product List
+                //ProductTreeView.ItemsSource = _layerInfoOC;
+                ProductList.ItemsSource = _layerInfoOC;
             }   // end try
             catch (Exception e)
             {
@@ -194,28 +177,12 @@ namespace QBasket_demo
 
         ///
         /// Use start up variables to define wms Uris
-        public void GetWmsUri()
+        #region NASA
+        public void SetWmsUri()
         {
-            // Retrieve URL components from the start up window
-            // Set latency
-            if (winStartUp.bestRB.IsChecked == true)
-                wmsUriStartup.latency = "best";
-            else if (winStartUp.stdRB.IsChecked == true)
-                wmsUriStartup.latency = "std";
-            else if (winStartUp.nrtRB.IsChecked == true)
-                wmsUriStartup.latency = "nrt";
-            else
-                wmsUriStartup.latency = "all";
-
-            // Set projection
-            if (winStartUp.epsg4326_RB.IsChecked == true)
-                wmsUriStartup.EPSG = "epsg4326";
-            else if (winStartUp.epsg3857_RB.IsChecked == true)
-                wmsUriStartup.EPSG = "epsg3857";
-            else if (winStartUp.epsg3413_RB.IsChecked == true)
-                wmsUriStartup.EPSG = "epsg3413";
-            else if (winStartUp.epsg3031_RB.IsChecked == true)
-                wmsUriStartup.EPSG = "epsg3031";
+            // Set latency and projection
+            wmsUriStartup.latency = "best";
+            wmsUriStartup.EPSG = "epsg4326";
 
             // Set and parse dates
             DateTime date = startDate_DP.SelectedDate.Value;
@@ -230,7 +197,8 @@ namespace QBasket_demo
                 wmsUriStartup.EPSG + "/" + wmsUriStartup.latency + "/" +
                 wmsUriStartup.service + ".cgi?SERVICE=WMS&REQUEST=GetCapabilities&VERSION=1.3.0";
 
-        }   // end GetWmsUri
+        }   // end SetWmsUri
+        #endregion NASA
 
 
         /// <summary>
@@ -240,20 +208,30 @@ namespace QBasket_demo
         /// <param name="e"></param>
         private void ToggleButton_OnChecked(object sender, RoutedEventArgs e)
         {
-            // Update the map. 
+            // Update the map.
             // Note: updating selection is handled by the IsEnabled property
             UpdateViewModel(_layerInfoOC);
-            if (haveSketch && haveLayer)
-                AOISelect.IsEnabled = true;
-            else
+
+            // If no layer is selected, turn off select button
+            if (haveLayer == false)
                 AOISelect.IsEnabled = false;
+
+            // Have a layer
+            else
+            {
+                // if there is a sketch, turn on select button
+                if (haveSketch)
+                    AOISelect.IsEnabled = true;
+                else
+                    AOISelect.IsEnabled = false;
+            }
         }   // end ToggleButton_OnChecked
 
 
         /// <summary>
         /// Updates the map view model
         /// </summary>
-        private void UpdateViewModel(ObservableCollection<LayerInfoVM> displayList)
+        private void UpdateViewModel(ObservableCollection<LayerInfoVM> productList)
         {
             // Remove all existing layers and redraw map
             if (BasemapView.Map.OperationalLayers.Count > 1)
@@ -262,9 +240,9 @@ namespace QBasket_demo
                 BasemapView.Map.OperationalLayers.Add(baseImageLayer);
             }
 
-            // Get a list of selected LayerInfos.
+            // Get a list of selected LayerInfos
             selectedLayers =
-                new List<WmsLayerInfo>(displayList.Where(checkBox => checkBox.IsEnabled).Select(checkBox => checkBox.Info).ToList());
+               new List<WmsLayerInfo>(productList.Where(checkBox => checkBox.Selected).Select(checkBox => checkBox.Info).ToList());
 
             // Return if no layers are selected.
             if (!selectedLayers.Any())
@@ -280,11 +258,6 @@ namespace QBasket_demo
             // Add the layer(s) to the map.
             BasemapView.Map.OperationalLayers.Add(showLayers);
 
-            foreach (LayerInfoVM layerInfo in _layerInfoOC)
-            {
-                Debug.WriteLine(" Title: " + layerInfo.Title);
-                Debug.WriteLine(" # of children : " + layerInfo.Children.Count);
-            }
         }   // end UpdateViewModel
 
 
@@ -294,10 +267,11 @@ namespace QBasket_demo
             Application.Current.Shutdown();
         }
 
-        /// Sort the layer OC 
-        /// SPecific to NASA GIBS:
+        /// Sort the layer list
+        /// Specific to NASA GIBS:
         /// Orbit tracks not included
         /// Want a list of items with no children
+        #region NASA
         public static void Sort_NASA_GIBS(IList<LayerInfoVM> unsorted, out IList<LayerInfoVM> sorted)
         {
             LayerInfoVM firstLayer;
@@ -309,6 +283,7 @@ namespace QBasket_demo
             sorted = temp.OrderBy(o => o.Info.Title).ToList();
 
         }   // end Sort_NASA_GIBS
+        #endregion 
     }   // end MainWindow partial class
 
 
@@ -346,7 +321,7 @@ namespace QBasket_demo
         public string startDate = String.Empty;
         public string endDate = String.Empty;
 
-        // Defined in GetWmsUri
+        // Defined in SetWmsUri
         public string value = String.Empty;
     }   // end timeClass
 
@@ -354,7 +329,7 @@ namespace QBasket_demo
     /// --------------------------------------------------
     /// Code Below taken from Runtime WMS Service Catalog
     /// --------------------------------------------------
-    /// This is a ViewModel class for maintaining the 
+    /// This is a ViewModel class for maintaining the
     /// state of a layer selection.
     /// LayerInfo has two public elements:
     ///     Info: WmsLayerInfo type
@@ -448,7 +423,7 @@ namespace QBasket_demo
 
                 if (!layer.Title.Contains("OrbitTracks"))
                 {
-                
+
                     // Create the view model for the sublayer.
                     LayerInfoVM layerVM = new LayerInfoVM(layer, root, false);
 
@@ -457,14 +432,10 @@ namespace QBasket_demo
 
                     // Recursively add children.
                     BuildLayerInfoList(layerVM, result);
-                
+
                 }
             }   // end foreach
         }   // end BuildLayerInfoList
-
-
-
-
 
 
         // Standard event parser -
@@ -479,8 +450,6 @@ namespace QBasket_demo
 
 
 /* GIBS defaults from worldview code
-   arctic_bad_size = 9949
-  antarctic_bad_size = 4060
   geographic_bad_size = 12088
 
   param_dict = {

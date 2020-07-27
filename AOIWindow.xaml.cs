@@ -34,7 +34,7 @@ namespace QBasket_demo
 
         }   // end initialize
 
-        // Dynamic Panel variables 
+        // Dynamic Panel variables
         public class PanelVariables
         {
             private List<string> _resolutionList = new List<string>();
@@ -97,7 +97,7 @@ namespace QBasket_demo
         }   // end ReturnBtn_Click
 
 
-        // Executed when any change is made to any Extent textbox
+        // Executed when any change is made to any Extent text box
         private void Extent_Changed(object sender, RoutedEventArgs e)
         {
             if (mainWin.haveSketch && mainWin.haveLayer)
@@ -158,7 +158,7 @@ namespace QBasket_demo
         }   // end RedrawAOI
 
 
-        // Reset operational layers to previous state
+        // Reset operational layers to state before AOI window opened
         private void ResetMapLayers()
         {
             WmsLayer showLayers = new WmsLayer(mainWin.selectedLayers);
@@ -188,8 +188,9 @@ namespace QBasket_demo
                     WmsLayer showLayer = new WmsLayer(layerList);
                     displayLayers.Add(showLayer);
                 }
-            }           
+            }
         }
+
 
         // Zoom Combo selection callback
         private void Zoom_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -212,7 +213,7 @@ namespace QBasket_demo
                     mainWin.ResetZoomLevels(ImageryTitle.SelectedIndex, "Jessie");
                 /*
              // Set the zoom level specific to image selected
-                mainWin.wmts.GetZoomRange(ImageryTitle.SelectedIndex, "Jessie", mainWin.wmts, 
+                mainWin.wmts.GetZoomRange(ImageryTitle.SelectedIndex, "Jessie", mainWin.wmts,
                                   mainWin.PIX_MIN, mainWin.PIX_MAX,
                                   double.Parse(MinLat.Text), double.Parse(MaxLat.Text),
                                   double.Parse(MinLon.Text), double.Parse(MaxLon.Text));
@@ -234,9 +235,12 @@ namespace QBasket_demo
                 zoomIdx = ZoomCombo.SelectedIndex;
                 if (zoomIdx < 0) zoomIdx = 1;
 
+                // Reset zoom index to correct wmts index
                 if (mainWin.wmts.layerTileSets != null && mainWin.wmts.layerTileSets.Count > 0)
                 {
-                    if (mainWin.wmts.layerTileSets[idx].resTypes != null && mainWin.wmts.layerTileSets[idx].resTypes.Count > 0)
+                    zoomIdx += mainWin.wmts.layerTileSets[idx].minZoom;
+                    if (mainWin.wmts.layerTileSets[idx].resTypes != null
+                        && mainWin.wmts.layerTileSets[idx].resTypes.Count > 0)
                     {
                         res = mainWin.wmts.layerTileSets[idx].resTypes[zoomIdx].resolution;
                         numLatPix = 10 * Convert.ToInt32(latDiff / res);
@@ -271,7 +275,6 @@ namespace QBasket_demo
 
                 // Reset Zoom levels for the new layer
                 mainWin.ResetZoomLevels(ImageryTitle.SelectedIndex, "Gilligan");
-                
             }
             /*
             mainWin.wmts.GetZoomRange(ImageryTitle.SelectedIndex, "Gilligan", mainWin.wmts,
@@ -299,7 +302,7 @@ namespace QBasket_demo
                                         ZoomCombo.SelectedIndex, Date.Text, bbox);
             */
             CheckoutBtn.IsEnabled = true;
-            mainWin.MainCheckoutBtn.IsEnabled = true;
+            // mainWin.MainCheckoutBtn.IsEnabled = true;
 
         }   // end ItemSaveBtn_Click
 
@@ -309,5 +312,10 @@ namespace QBasket_demo
         {
             Application.Current.Shutdown();
         }   // end QAOIWindow_Closing
+
+        private void AOI_SelectedDateChanged(object sender, SelectionChangedEventArgs e)
+        {
+
+        }
     }   // end  partial class AOIWindow
 }   // end namespace
